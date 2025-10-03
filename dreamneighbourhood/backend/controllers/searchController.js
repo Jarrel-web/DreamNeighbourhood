@@ -1,5 +1,5 @@
 import axios from "axios";
-import { token } from "../utils/oneMapToken";
+import { fetchOneMapToken } from "../utils/oneMapToken";
 
 export const searchHandler = async (req, res) => {
   try {
@@ -11,7 +11,7 @@ export const searchHandler = async (req, res) => {
 
     // Define the API endpoint and authentication details
     const apiUrl = "https://www.onemap.gov.sg/api/common/elastic/search";
-    const authToken = token; // Use the token from oneMapToken.js
+    const authToken = fetchOneMapToken(); // Retrieve the OneMap API token
 
     // Make the authenticated request to the external API
     const response = await axios.get(apiUrl, {
