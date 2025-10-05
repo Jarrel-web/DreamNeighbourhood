@@ -7,7 +7,7 @@ let token = null;
 let tokenExpiry = null;
 
 // Encryption key (use a secure key and store it in your .env file)
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "default_secure_key_123"; // Must be 32 bytes
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY; 
 const IV_LENGTH = 16; // Initialization vector length
 
 // Function to encrypt data
