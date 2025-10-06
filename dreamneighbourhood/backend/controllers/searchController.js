@@ -1,5 +1,4 @@
-import axios from "axios";
-import { fetchOneMapToken } from "../utils/oneMapToken";
+import { makeOneMapRequest } from "../utils/oneMapRequest.js";
 
 export const searchHandler = async (req, res) => {
   try {
@@ -9,23 +8,20 @@ export const searchHandler = async (req, res) => {
       return res.status(400).json({ message: "Search query is required" });
     }
 
-    // Define the API endpoint and authentication details
-    const apiUrl = "https://www.onemap.gov.sg/api/common/elastic/search";
-    const authToken = fetchOneMapToken(); // Retrieve the OneMap API token
+    // Use the token attached by oneMapAuth
+    const token = req.oneMapToken;
 
-    // Make the authenticated request to the external API
-    const response = await axios.get(apiUrl, {
-      params: { searchVal: query, returnGeom: "Y", getAddrDetails: "Y" },
-      headers: { Authorization: `Bearer ${authToken}` }, // Include the API key in the Authorization header
-    });
+    // Define the parameters for the OneMap API request
+    const params = { searchVal: query, returnGeom: "Y", getAddrDetails: "Y" };
 
-    // Return the API response to the client
+    // Make the API request
+    const data = await makeOneMapRequest("common/elastic/search", params, token);
+
+    // Return the API response
     res.status(200).json({
       message: "Search results",
-      results: response.data,
+      results: data.results,
     });
-
-    return response.json(); // Return response as JSON
   } catch (error) {
     console.error("Error handling search:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });

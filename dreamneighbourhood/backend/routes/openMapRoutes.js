@@ -1,9 +1,10 @@
 import express from "express";
 import { searchHandler } from "../controllers/searchController.js";
+import { attachOneMapToken } from "../middleware/oneMapAuth.js";
 
 const router = express.Router();
 
-// Handles search inquiries
-router.get("https://www.onemap.gov.sg/api/common/elastic/search", searchHandler);
+// Route for search requests
+router.get("/search", attachOneMapToken, searchHandler);
 
 export default router;
