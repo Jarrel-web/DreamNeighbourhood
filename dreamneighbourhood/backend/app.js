@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import userRoutes from "./routes/userRoutes.js";
-
+import favouritesRoutes from "./routes/favouriteRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -11,7 +11,8 @@ const app = express();
 app.use(bodyParser.json());
 
 // Routes
-app.use("/api/users", userRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/favourites", favouritesRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
