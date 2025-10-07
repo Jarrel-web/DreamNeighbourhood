@@ -2,7 +2,7 @@ import { makeOneMapRequest } from "../utils/oneMapRequest.js";
 
 export const searchHandler = async (req, res) => {
   try {
-    const { query } = req.query; // Extract the search query from query parameters
+    const { query, amenity} = req.query; // Extract the search query, include optional amenity parameter
 
     if (!query) {
       return res.status(400).json({ message: "Search query is required" });
@@ -11,8 +11,10 @@ export const searchHandler = async (req, res) => {
     // Use the token attached by oneMapAuth
     const token = req.oneMapToken;
 
+    const searchVal = amenity ? `${query} ${amenity}` : query; // Modify searchVal according to the presence of amenity filter.
+
     // Define the parameters for the OneMap API request
-    const params = { searchVal: query, returnGeom: "Y", getAddrDetails: "Y" };
+    const params = { searchVal, returnGeom: "Y", getAddrDetails: "Y" };
 
     // Make the API request
     const data = await makeOneMapRequest("common/elastic/search", params, token);
