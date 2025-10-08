@@ -1,8 +1,9 @@
 import axios from "axios";
-
-export const makeOneMapRequest = async (endpoint, params, token) => {
+import { getOneMapToken } from "./oneMapToken.js";
+export const makeOneMapRequest = async (endpoint, params) => {
   try {
-    const apiUrl = `https://www.onemap.gov.sg/api/${endpoint}`; // Allows reuse for other API requests
+    const token = await getOneMapToken();
+    const apiUrl = `https://developers.onemap.sg/privateapi/convert/addrToCoord${endpoint}`; // Allows reuse for other API requests
     const response = await axios.get(apiUrl, {
       params,
       headers: { Authorization: `${token}` }, // Use the token for authentication

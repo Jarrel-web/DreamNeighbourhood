@@ -1,90 +1,55 @@
-import fetch from 'node-fetch';
-import crypto from 'crypto';
-import dotenv from 'dotenv';
+import axios from "axios";
+import dotenv from "dotenv";
 dotenv.config();
 
 let token = null;
 let tokenExpiry = null;
 
-// Encryption key (use a secure key and store it in your .env file)
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY; 
-const IV_LENGTH = 16; // Initialization vector length
-
-// Function to encrypt data
-const encrypt = (text) => {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-  let encrypted = cipher.update(text);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return iv.toString('hex') + ':' + encrypted.toString('hex'); // Combine IV and encrypted data
-};
-
-// Function to decrypt data
-const decrypt = (encryptedText) => {
-  const textParts = encryptedText.split(':');
-  const iv = Buffer.from(textParts.shift(), 'hex');
-  const encryptedData = Buffer.from(textParts.join(':'), 'hex');
-  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-  let decrypted = decipher.update(encryptedData);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-};
-
-const getOneMapToken = async () => {
-  // Function to get a new token from OneMap API
-  const url = "https://www.onemap.gov.sg/api/auth/post/getToken";
-
-  // Prepare the data payload
-  const data = JSON.stringify({
-    email: process.env.ONEMAP_EMAIL,
-    password: process.env.ONEMAP_EMAIL_PASSWORD,
-  });
+/**
+ * Fetch a new OneMap token from the API
+ */
+const fetchNewToken = async () => {
+  if (!process.env.ONEMAP_EMAIL || !process.env.ONEMAP_EMAIL_PASSWORD) {
+    throw new Error("OneMap credentials missing in .env");
+  }
 
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: data,
+    const res = await axios.post("https://www.onemap.gov.sg/api/auth/post/getToken", {
+      email: process.env.ONEMAP_EMAIL,
+      password: process.env.ONEMAP_EMAIL_PASSWORD,
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    const data = res.data;
+
+    if (!data.access_token || !data.expiry_timestamp) {
+      throw new Error("Invalid token response from OneMap");
     }
 
-    const responseData = await response.json();
+    token = data.access_token;
+    tokenExpiry = data.expiry_timestamp; // Unix timestamp
+    console.log("✅ OneMap token fetched");
 
-    // Encrypt the token before storing it in memory
-    token = encrypt(responseData.access_token);
-    tokenExpiry = responseData.expiry_timestamp; // Store expiry timestamp as is (Unix format)
-
-    console.log("New token fetched.");
-  } catch (error) {
-    console.error('Error fetching OneMap token:', error);
-    throw error;
+    return token;
+  } catch (err) {
+    console.error("❌ Error fetching OneMap token:", err.message);
+    throw err;
   }
 };
 
-const isTokenValid = () => {
-  // Check if the token is still valid (not expired)
-  return token && tokenExpiry && Math.floor(Date.now() / 1000) < tokenExpiry;
-};
-
-const fetchOneMapToken = async () => {
-  // Fetch a new token if the current one is invalid or expired
-  if (!isTokenValid()) {
-    await getOneMapToken();
-    console.log("New OneMap token fetched.");
-  } else {
-    console.log("Existing OneMap token is still valid.");
+/**
+ * Returns a valid OneMap token (cached if not expired)
+ */
+export const getOneMapToken = async () => {
+  const now = Math.floor(Date.now() / 1000);
+  if (!token || !tokenExpiry || now >= tokenExpiry) {
+    // Token expired or missing, fetch a new one
+    return await fetchNewToken();
   }
 
-  // Decrypt the token before returning it
-  return decrypt(token);
+  // Return cached token
+  return token;
 };
 
-// Immediately fetch a token when the module is loaded
-fetchOneMapToken();
 
-export default fetchOneMapToken;
+
+
