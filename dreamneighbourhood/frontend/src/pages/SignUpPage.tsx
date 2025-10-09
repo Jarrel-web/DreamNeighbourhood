@@ -16,26 +16,36 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
-import { login, saveToken } from "@/services/auth";
+import { register } from "@/services/auth";
 
-const LoginPage: React.FC = () => {
+const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
     setSubmitting(true);
     try {
-      const res = await login(email, password);
-      saveToken(res.token);
-      navigate("/");
+      await register(username, email, password);
+      setSuccess(
+        "Registration successful. Please check your email to verify your account."
+      );
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Login failed";
+      const msg = err instanceof Error ? err.message : "Registration failed";
       setError(msg);
     } finally {
       setSubmitting(false);
@@ -52,13 +62,24 @@ const LoginPage: React.FC = () => {
               Welcome !
             </CardTitle>
             <CardDescription className="text-start text-xl font-semi-bold">
-              Login to Dream Neighbourhood
+              Sign Up to Dream Neighbourhood
             </CardDescription>
           </CardHeader>
 
           <CardContent>
             <form onSubmit={onSubmit}>
               <div className="flex flex-col gap-6">
+                <div className="grid gap-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="your username"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -73,12 +94,6 @@ const LoginPage: React.FC = () => {
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <Link
-                      to="/forgotPassword"
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      Forgot your password?
-                    </Link>
                   </div>
                   <div className="relative">
                     <Input
@@ -102,10 +117,38 @@ const LoginPage: React.FC = () => {
                       )}
                     </Toggle>
                   </div>
+                  <div className="flex items-center justify-between mt-3">
+                    <Label htmlFor="password">Confirm Password</Label>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      className="pr-10"
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                    <Toggle
+                      pressed={showPassword}
+                      onPressedChange={setShowPassword}
+                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                    >
+                      {showPassword ? (
+                        <Eye className="w-4 h-4" />
+                      ) : (
+                        <EyeOff className="w-4 h-4" />
+                      )}
+                    </Toggle>
+                  </div>
                 </div>
               </div>
               {error ? (
                 <p className="text-red-600 text-sm mt-4">{error}</p>
+              ) : null}
+              {success ? (
+                <p className="text-green-600 text-sm mt-4">{success}</p>
               ) : null}
               <CardFooter className="flex flex-col mt-10 px-0 w-full">
                 <Button
@@ -113,7 +156,7 @@ const LoginPage: React.FC = () => {
                   className="bg-light-blue text-white hover:bg-blue-300 w-full"
                   disabled={submitting}
                 >
-                  {submitting ? "Signing in..." : "Login"}
+                  {submitting ? "Creating account..." : "Create account"}
                 </Button>
               </CardFooter>
             </form>
@@ -121,7 +164,7 @@ const LoginPage: React.FC = () => {
           <CardContent className="flex items-center justify-center">
             <CardAction className="text-center items-center">
               <Button variant="link">
-                <Link to="/signup">Don’t have an Account? Register here</Link>
+                <Link to="/login">Already have an account? Login here</Link>
               </Button>
             </CardAction>
           </CardContent>
@@ -140,4 +183,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

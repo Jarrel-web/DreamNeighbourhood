@@ -31,7 +31,7 @@ function HomePage() {
             asChild
             variant="outline"
             size="lg"
-            className="bg-white text-blue-600 hover:bg-blue-50"
+            className="bg-white text-light-blue hover:bg-blue-50"
           >
             <Link to={routes.propertiesSearch}>Search Now</Link>
           </Button>

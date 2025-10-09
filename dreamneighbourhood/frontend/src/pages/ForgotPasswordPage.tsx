@@ -13,33 +13,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import loginImg from "../assets/images/Login.png";
 import { Link, useNavigate } from "react-router-dom";
+import resetPasswordImg from "../assets/images/resetPassword.png";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { Toggle } from "@/components/ui/toggle";
-import { login, saveToken } from "@/services/auth";
+import { toast } from "react-hot-toast";
+// import { sendVerificationEmail } from "@/services/auth";
 
-const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
+const ForgetPasswordPage: React.FC = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
     setSubmitting(true);
     try {
-      const res = await login(email, password);
-      saveToken(res.token);
-      navigate("/");
+      console.log(email);
+      // await sendVerificationEmail(email);
+      toast.success("Check your email to verify your account");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Login failed";
-      setError(msg);
+      toast.error(err instanceof Error ? err.message : "Failed to send email");
     } finally {
       setSubmitting(false);
     }
+    
   }
 
   return (
@@ -47,15 +44,21 @@ const LoginPage: React.FC = () => {
       {/* Login Form */}
       <div className="w-full flex justify-end mr-30">
         <Card className="w-full max-w-sm shadow-md border border-gray-200">
+          <section className="flex justify-center items-center">
+            <img
+              src={resetPasswordImg}
+              alt="DreamNeighbourhood illustration"
+              className="max-w-full h-auto rounded-lg"
+            />
+          </section>
           <CardHeader>
             <CardTitle className="text-2xl font-semibold text-start">
-              Welcome !
+              Reset your password!
             </CardTitle>
             <CardDescription className="text-start text-xl font-semi-bold">
-              Login to Dream Neighbourhood
+              Sign Up to Dream Neighbourhood
             </CardDescription>
           </CardHeader>
-
           <CardContent>
             <form onSubmit={onSubmit}>
               <div className="flex flex-col gap-6">
@@ -70,50 +73,14 @@ const LoginPage: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                <div className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      to="/forgotPassword"
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      Forgot your password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      required
-                      className="pr-10"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <Toggle
-                      pressed={showPassword}
-                      onPressedChange={setShowPassword}
-                      className="absolute right-2 top-1/2 -translate-y-1/2"
-                    >
-                      {showPassword ? (
-                        <Eye className="w-4 h-4" />
-                      ) : (
-                        <EyeOff className="w-4 h-4" />
-                      )}
-                    </Toggle>
-                  </div>
-                </div>
               </div>
-              {error ? (
-                <p className="text-red-600 text-sm mt-4">{error}</p>
-              ) : null}
               <CardFooter className="flex flex-col mt-10 px-0 w-full">
                 <Button
                   type="submit"
                   className="bg-light-blue text-white hover:bg-blue-300 w-full"
                   disabled={submitting}
                 >
-                  {submitting ? "Signing in..." : "Login"}
+                  {submitting ? "Sending..." : "Send verification email"}
                 </Button>
               </CardFooter>
             </form>
@@ -121,7 +88,7 @@ const LoginPage: React.FC = () => {
           <CardContent className="flex items-center justify-center">
             <CardAction className="text-center items-center">
               <Button variant="link">
-                <Link to="/signup">Don’t have an Account? Register here</Link>
+                <Link to="/login">Already have an account? Login here</Link>
               </Button>
             </CardAction>
           </CardContent>
@@ -140,4 +107,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default ForgetPasswordPage;

@@ -9,6 +9,8 @@ import PropertiesMapPage from "../pages/PropertiesMapPage";
 import FavouritesPage from "../pages/FavouritesPage";
 import ErrorPage from "@/pages/ErrorPage";
 import ProfilePage from "@/pages/ProfilePage";
+import SignUpPage from "@/pages/SignUpPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 
 export const routerConfig = createBrowserRouter([
   {
@@ -42,6 +44,14 @@ export const routerConfig = createBrowserRouter([
       {
         path: routes.account,
         Component: ProfilePage,
+      },
+      {
+        path: routes.signUp,
+        Component: SignUpPage
+      },
+      {
+        path: routes.forgotPassword,
+        Component: ForgotPasswordPage,
       },
       {
         path: routes.error,

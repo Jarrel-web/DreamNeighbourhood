@@ -104,12 +104,12 @@ const NavBar: React.FC = () => {
                         "px-5 py-2 text-lg font-semibold transition-colors",
                         item.isPrimary
                           ? // Primary button (Login / My Profile)
-                            "bg-white text-blue-600 border rounded-xl border-blue-300 hover:bg-blue-50 active:bg-blue-100"
+                            "bg-white text-light-blue border rounded-xl border-blue-300 hover:bg-blue-50 active:bg-blue-100"
                           : isActive
                           ? // Active link styling
-                            "text-blue-600 border-b-2 border-blue-600"
+                            "text-blue-600 border-b-2 border-light-blue"
                           : // Inactive link styling
-                            "text-foreground hover:text-blue-500"
+                            "text-foreground hover:text-light-blue"
                       )}
                     >
                       {item.name}
