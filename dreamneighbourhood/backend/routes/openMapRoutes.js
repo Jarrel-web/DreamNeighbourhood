@@ -4,7 +4,7 @@ import { attachOneMapToken } from "../middleware/oneMapAuth.js";
 
 const router = express.Router();
 
-// Route for search requests
+// Route for search requests -> attach (middleware) -> controller
 router.get("/search", attachOneMapToken, searchHandler);
 
 export default router;

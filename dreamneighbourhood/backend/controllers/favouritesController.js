@@ -31,26 +31,26 @@ export const viewFavoriteProperty = async (req, res) => {
 export const addFavoriteProperty = async (req, res) => {
   try {
     const userId = req.user.id; // Extract user ID (to refer to the db)
-    const { propertyId } = req.body; // Extract property ID (can use postal code or address returned from OneMap query)
+    const { propertyId: propertyAddr } = req.body; // Extract property address 
 
-    if (!propertyId) {
-      return res.status(400).json({ message: "Property ID is required." });
+    if (!propertyAddr) {
+      return res.status(400).json({ message: "Property address is required." });
     }
 
     // Check if property exists
     const propertyExists = await pool.query(
       "SELECT id FROM properties WHERE id = $1",
-      [propertyId]
+      [propertyAddr]
     );
     if (propertyExists.rowCount === 0) {
       return res.status(404).json({ message: "Property not found." });
     }
 
 
-    // Check if the property already exists in the user's favorites
+    // Check if the property already exists by matching user and address.
     const existingFavorite = await pool.query(
-      "SELECT * FROM user_favorites WHERE user_id = $1 AND property_id = $2",
-      [userId, propertyId]
+      "SELECT * FROM user_favorites WHERE user_id = $1 AND property_addr = $2",
+      [userId, propertyAddr]
     );
 
     if (existingFavorite.rows.length > 0) {
@@ -59,8 +59,8 @@ export const addFavoriteProperty = async (req, res) => {
 
     // Add the property to the user's favorites
     await pool.query(
-      "INSERT INTO user_favorites (user_id, property_id) VALUES ($1, $2)",
-      [userId, propertyId]
+      "INSERT INTO user_favorites (user_id, property_addr) VALUES ($1, $2)",
+      [userId, propertyAddr]
     );
 
     res.status(201).json({ message: "Property added to favorites" });
@@ -73,16 +73,16 @@ export const addFavoriteProperty = async (req, res) => {
 export const removeFavoriteProperty = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { property_id } = req.params;
+    const { property_id: property_addr } = req.params;
 
-     if (!property_id) {
-      return res.status(400).json({ message: "Property ID is required." });
+     if (!property_addr) {
+      return res.status(400).json({ message: "Property Address is required." });
     }
 
-    // Check if favourite exists
+    // Check if favourite exists in database
     const favCheck = await pool.query(
-      "SELECT * FROM favourites WHERE user_id = $1 AND property_id = $2",
-      [userId, property_id]
+      "SELECT * FROM favourites WHERE user_id = $1 AND property_addr = $2",
+      [userId, property_addr]
     );
     if (favCheck.rowCount === 0) {
       return res.status(404).json({ message: "Favourite not found." });
@@ -90,8 +90,8 @@ export const removeFavoriteProperty = async (req, res) => {
 
     // Remove favourite
     await pool.query(
-      "DELETE FROM favourites WHERE user_id = $1 AND property_id = $2",
-      [userId, property_id]
+      "DELETE FROM favourites WHERE user_id = $1 AND property_addr = $2",
+      [userId, property_addr]
     );
 
     res.status(200).json({ message: "Removed from favourites successfully." });

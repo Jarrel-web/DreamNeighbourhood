@@ -39,7 +39,7 @@ const fetchNewToken = async () => {
 /**
  * Returns a valid OneMap token (cached if not expired)
  */
-export const getOneMapToken = async () => {
+export const fetchOneMapToken = async () => {
   const now = Math.floor(Date.now() / 1000);
   if (!token || !tokenExpiry || now >= tokenExpiry) {
     // Token expired or missing, fetch a new one

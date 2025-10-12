@@ -9,8 +9,8 @@ import { authenticateToken } from "../middleware/auth.js";
 const router = express.Router();
 
 // Protected routes
-router.get("/", authenticateToken, viewFavoriteProperty);
+router.get("/view", authenticateToken, viewFavoriteProperty);
 router.post("/add", authenticateToken, addFavoriteProperty);
-router.delete("/:property_id", authenticateToken, removeFavoriteProperty);
+router.delete("/delete", authenticateToken, removeFavoriteProperty); 
 
 export default router;
