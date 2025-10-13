@@ -1,11 +1,12 @@
 import dotenv from 'dotenv';
-dotenv.config(debug=true);
+dotenv.config();
 import request from 'supertest';
 import app from '../app.js';
 import { makeOneMapRequest } from '../utils/oneMapRequest.js';
 
+
 // Mock the makeOneMapRequest function
-jest.mock('../utils/oneMapRequest.js');
+ // jest.mock('../utils/oneMapRequest.js');
 
 describe('Search API', () => {
   // Reset all mocks before each test
@@ -88,7 +89,7 @@ describe('Search API', () => {
       makeOneMapRequest.mockResolvedValue(mockResults);
 
       const response = await request(app)
-        .get('/api/search?query=test&amenity=park')
+        .get('/api/v1/search?query=test&amenity=park')
         .expect('Content-Type', /json/)
         .expect(200);
 
@@ -112,7 +113,7 @@ describe('Search API', () => {
       makeOneMapRequest.mockRejectedValue(new Error('API Error'));
 
       const response = await request(app)
-        .get('/api/search?query=test')
+        .get('/api/v1/search?query=test')
         .expect('Content-Type', /json/)
         .expect(500);
 
