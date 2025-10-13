@@ -5,22 +5,41 @@ export type RegisterResponse = {
   user: { id: number; username: string; email: string };
 };
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const TOKEN_KEY = "dn_jwt";
 
-export async function login(
-  email: string,
-  password: string
-): Promise<LoginResponse> {
-  const res = await fetch(`${API_BASE}/users/login`, {
+async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    ...options,
+  });
+
+  let data: any = {};
+  try {
+    data = await res.json();
+  } catch {
+    /* empty */
+  }
+
+  if (!res.ok) {
+    throw new Error(data.message ?? `Request failed: ${res.status}`);
+  }
+
+  return data as T;
+}
+
+
+export async function login(email: string, password: string): Promise<LoginResponse> {
+  return apiRequest<LoginResponse>("/users/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.message ?? "Login failed");
-  }
-  return res.json();
 }
 
 export async function register(
@@ -28,30 +47,26 @@ export async function register(
   email: string,
   password: string
 ): Promise<RegisterResponse> {
-  const res = await fetch(`${API_BASE}/users/register`, {
+  return apiRequest<RegisterResponse>("/users/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, password }),
   });
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.message ?? "Registration failed");
-  }
-  return res.json();
 }
-
 export function saveToken(token: string) {
-  localStorage.setItem("dn_jwt", token);
+  localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function getToken(): string | null {
-  return localStorage.getItem("dn_jwt");
+  return localStorage.getItem(TOKEN_KEY);
 }
 
 export function clearToken() {
-  localStorage.removeItem("dn_jwt");
+  localStorage.removeItem(TOKEN_KEY);
 }
 
+/**
+ * Auth header generator
+ */
 export function authHeader(): HeadersInit {
   const token = getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
