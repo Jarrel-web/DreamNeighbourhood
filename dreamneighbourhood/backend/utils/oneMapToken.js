@@ -2,7 +2,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 
-let token = null;
+export let token = null;
 let tokenExpiry = null;
 
 /**
@@ -50,6 +50,6 @@ export const fetchOneMapToken = async () => {
   return token;
 };
 
-
+fetchOneMapToken(); // Initial fetch on startup to avoid delay on first request
 
 
