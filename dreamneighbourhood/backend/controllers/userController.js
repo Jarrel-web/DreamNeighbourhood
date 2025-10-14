@@ -31,7 +31,7 @@ export const registerUser = async (req, res) => {
     );
 
 
-    await sendVerificationEmail(email, verificationToken);
+    await sendVerificationEmail(email,username, verificationToken);
     
      res.status(201).json({
       message: "User registered successfully",
@@ -48,7 +48,7 @@ export const registerUser = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
-
+    
     const user = await pool.query(
       "SELECT * FROM users WHERE verification_token = $1",
       [token]

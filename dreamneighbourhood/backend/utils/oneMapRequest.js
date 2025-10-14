@@ -1,8 +1,8 @@
 
 import { token } from "./oneMapToken.js";
 
-const axios = require("axios");
-export const oneMapSearch = async (endpoint, params={}) => {
+import axios from "axios";
+export const oneMapSearch = async (endpoint, params) => {
   try {
     const apiUrl = `https://www.onemap.sg/api/${endpoint}`; // Allows reuse for other API requests
     const response = await axios.get(apiUrl, {
