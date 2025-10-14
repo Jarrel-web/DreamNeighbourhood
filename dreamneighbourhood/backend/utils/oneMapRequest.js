@@ -2,11 +2,11 @@
 import { token } from "./oneMapToken.js";
 
 const axios = require("axios");
-export const oneMapSearch = async (endpoint, params) => {
+export const oneMapSearch = async (endpoint, params={}) => {
   try {
     const apiUrl = `https://www.onemap.sg/api/${endpoint}`; // Allows reuse for other API requests
     const response = await axios.get(apiUrl, {
-      params: {params},
+      params: params,
       headers: { Authorization: `${token}` }, // Use the token for authentication
     }).then(res => res.json());
     return response.data; // Return the API response data
