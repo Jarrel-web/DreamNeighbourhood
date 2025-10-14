@@ -1,8 +1,8 @@
-import { getUraToken } from "../middleware/uraPropertyAuth";
-import { access_key } from "../middleware/uraPropertyAuth";
+import { getUraToken } from "../middleware/uraPropertyAuth.js";
+import axios from 'axios';
 
 const token = await getUraToken();
-const axios = require("axios");
+const access_key = process.env.URA_ACCESS_KEY;
 
 export const uraPropertySearch = async (endpoint, params) => {
     try {
