@@ -21,9 +21,7 @@ app.use(cors({
 
 // Routes
 app.use("/api/v1/users", userRoutes);
-app.get("/api/v1/favourites/view", favouriteRoutes);
-app.post("/api/v1/favourites/add", favouriteRoutes);
-app.delete("/api/v1/favourites/delete", favouriteRoutes);
+app.use("/api/v1/favourites", favouriteRoutes);
 app.use("/api/v1/search", openMapRoutes);
 
 // Start server
