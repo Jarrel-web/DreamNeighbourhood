@@ -1,4 +1,3 @@
-import {pool} from '../db.js';
 import { calculateBoundingBox } from '../utils/Filters.js';
 import { oneMapSearch } from '../utils/oneMapRequest.js';
 

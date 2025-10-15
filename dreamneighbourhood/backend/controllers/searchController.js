@@ -1,6 +1,6 @@
 import { oneMapSearch } from "../utils/oneMapRequest.js";
 import { uraPropertySearch } from "../utils/uraPropertyRequest.js";
-import { calculateDistanceLatLon, calculateDistanceSVY21 } from "../utils/Filters.js";
+import { calculateDistance } from "../utils/Filters.js";
 import { boundaries } from "../scripts/drawMapBoundaries.js";
 import { pool } from "../config/db.js";
 
@@ -77,7 +77,7 @@ export const amenityDistanceFilter = async (req, res) => {
 
         themeLocations[amenityTheme].forEach(amenity => {
           const [Lng, Lat] = amenity.LatLng.split(',').map(Number);
-          const d = calculateDistanceLatLon(
+          const d = calculateDistance(
             property.latitude,
             property.longitude,
             Lat,
@@ -130,3 +130,13 @@ export const amenityDistanceFilter = async (req, res) => {
   }
 }
 
+/* export const priceFilter = async (req, res) => {
+  try {
+
+
+
+  } catch (error) {
+    console.error("Error handling price filter:", error.message);
+  }
+}
+*/

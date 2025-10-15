@@ -23,4 +23,19 @@ export const findBoundary = (lat, lon, distanceKm) => {
     return `${lat - latOffset},${lon - LonOffset},${lat + latOffset},${lon + LonOffset}`;
 };
 
+export const calculateBoundingBox = (points) => {
+    let minLat = points[0][1];
+    let maxLat = points[0][1];
+    let minLon = points[0][0];
+    let maxLon = points[0][0];
 
+    points.forEach(([lon, lat]) => {
+        minLat = Math.min(minLat, lat);
+        maxLat = Math.max(maxLat, lat);
+        minLon = Math.min(minLon, lon);
+        maxLon = Math.max(maxLon, lon);
+    });
+
+    return [[minLat, minLon], [maxLat, maxLon]];
+
+}
