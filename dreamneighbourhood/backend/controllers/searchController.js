@@ -1,7 +1,7 @@
 import { oneMapSearch } from "../utils/oneMapRequest.js";
 import { uraPropertySearch } from "../utils/uraPropertyRequest.js";
 import { calculateDistance } from "../utils/Filters.js";
-import { boundaries } from "../scripts/drawMapBoundaries.js";
+import { getBoundaries } from "../scripts/drawMapBoundaries.js";
 import { pool } from "../config/db.js";
 
 export const searchHandler = async (req, res) => {
@@ -46,7 +46,8 @@ export const amenityDistanceFilter = async (req, res) => {
     district = district.toUpperCase();
   // Getting all related themes and housing locations and coordinates
   // Getting locations of themes (onemap sucks balls)
-    const extents = boundaries[district].join(',');
+    let extents = await getBoundaries(district);
+    extents = extents[district].join(",");
 
     let themeLocations = {};
     for (let i = 0; i < params.length; i++) {
@@ -99,7 +100,7 @@ export const amenityDistanceFilter = async (req, res) => {
       })
 
 
-      // There is probably a better way to do this
+
       return {
         id: property.id,
         town: property.town,
@@ -130,13 +131,18 @@ export const amenityDistanceFilter = async (req, res) => {
   }
 }
 
-/* export const priceFilter = async (req, res) => {
+// Sort current page results by price range
+// current page == results in request body. This is to avoid re-querying databases
+// request structure: body {results: [{property}]}, query {minPrice, maxPrice}
+export const priceFilter = async (req, res) => {
   try {
-
+    const {minPrice, maxPrice} = req.query;
+    let {results} = req.body;
+    
+    
 
 
   } catch (error) {
     console.error("Error handling price filter:", error.message);
   }
 }
-*/
