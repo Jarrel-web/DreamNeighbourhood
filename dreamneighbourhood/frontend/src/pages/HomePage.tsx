@@ -61,15 +61,6 @@ function HomePage() {
             </div>
           </Link>
 
-          <Link to={routes.propertiesMap} className="block">
-            <div className="bg-card p-6 rounded-lg shadow-l border hover:shadow-md transition-shadow">
-              <h3 className="text-lg font-semibold mb-2">Map View</h3>
-              <p className="text-muted-foreground text-sm">
-                View properties on an interactive map to see their exact
-                location and surroundings.
-              </p>
-            </div>
-          </Link>
         </div>
       </div>
       {/*Favorites Section*/}

@@ -4,10 +4,13 @@ import type { Property } from "src/types/property";
 function formatCurrency(n: number) {
   return n.toLocaleString("en-SG", { style: "currency", currency: "SGD", maximumFractionDigits: 0 });
 }
+type Props = { property: Property; onClick?: (p: Property) => void };
 
-const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
+const PropertyCard: React.FC<Props> = ({ property, onClick }) => {
   return (
-    <div className="rounded-xl border bg-card p-4 sm:p-5 shadow-sm flex gap-4">
+    <button
+      onClick={() => onClick?.(property)}
+      className="w-full text-left rounded-xl border bg-card p-4 sm:p-5 shadow-sm flex gap-4 hover:shadow transition">
       {/* image placeholder; replace with real images later */}
       <div className="w-40 h-28 rounded-lg bg-muted shrink-0" />
       <div className="flex-1 min-w-0">
@@ -27,7 +30,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
         <div className="text-xl sm:text-2xl font-bold">{formatCurrency(property.resale_price)}</div>
         <div className="text-xs text-muted-foreground">{property.rooms || "?"}-Room</div>
       </div>
-    </div>
+    </button>
   );
 };
 
