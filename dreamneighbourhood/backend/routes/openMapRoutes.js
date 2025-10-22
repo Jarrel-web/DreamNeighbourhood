@@ -1,3 +1,4 @@
+/*
 import express from "express";
 import { searchHandler } from "../controllers/searchController.js";
 import { amenityDistanceFilter } from "../controllers/searchController.js";
@@ -12,3 +13,4 @@ router.get("/search", attachOneMapToken, searchHandler);
 router.get("/amenity_sort", amenityDistanceFilter);
 
 export default router;
+*/

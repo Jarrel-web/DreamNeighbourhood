@@ -1,3 +1,4 @@
+/*
 import { oneMapSearch } from "../utils/oneMapRequest.js";
 import { uraPropertySearch } from "../utils/uraPropertyRequest.js";
 import { calculateDistance } from "../utils/Filters.js";

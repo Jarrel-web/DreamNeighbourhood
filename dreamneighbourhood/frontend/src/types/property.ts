@@ -1,5 +1,6 @@
 export type Property = {
-    id: string;                 // derived stable id
+    address: string;
+    id: number;                 // derived stable id
     month: string;
     town: string;
     flat_type: string;
@@ -14,7 +15,7 @@ export type Property = {
     postal_code: string;
     latitude?: number;
     longitude?: number;
-
+    isInitiallyFavourite?: boolean;
     // derived fields
     rooms: number;
     address_line: string;

@@ -1,6 +1,23 @@
 import { pool } from "../config/db.js";
 
+export const getFavouriteProperty = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const propertyId = req.params.propertyId;
 
+    const result = await pool.query(
+      "SELECT * FROM user_favorites WHERE user_id = $1 AND property_id = $2",
+      [userId, propertyId]
+    );
+
+    res.status(200).json({
+      isFavourite: result.rows.length > 0, // true if exists
+    });
+  } catch (error) {
+    console.error("Error fetching favourite:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 export const viewFavoriteProperty = async (req, res) => {
   try {
     const userId = req.user.id;

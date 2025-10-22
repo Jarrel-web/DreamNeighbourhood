@@ -7,8 +7,8 @@ export const routes = {
   propertyDetails: "/property/:id",
   properties: "/properties",
   propertiesSearch: "/properties/search",
-  propertiesMap: "/properties/map",
   favourites: "/favourites",
   account: "/account",
   error: "*",
+  profile: "/profile",
 };
