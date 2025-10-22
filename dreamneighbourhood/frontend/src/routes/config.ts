@@ -11,4 +11,5 @@ export const routes = {
   favourites: "/favourites",
   account: "/account",
   error: "*",
+  profile: "/profile",
 };

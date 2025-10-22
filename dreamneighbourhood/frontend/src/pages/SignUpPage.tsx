@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardAction,
@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import loginImg from "../assets/images/Login.png";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 import { register } from "@/services/auth";
@@ -33,10 +32,12 @@ const SignUpPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+
     setSubmitting(true);
     try {
       await register(username, email, password);
@@ -53,10 +54,11 @@ const SignUpPage: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-items-center px-6 md:px-16">
-      {/* Login Form */}
-      <div className="w-full flex justify-end mr-30">
-        <Card className="w-full max-w-sm shadow-md border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 md:px-8">
+      <div className="flex w-full max-w-[960px] items-center justify-center gap-8 md:gap-12 flex-wrap md:flex-nowrap">
+
+        {/* Sign Up Card */}
+        <Card className="w-full max-w-[420px] flex-shrink-0 shadow-md border border-gray-200">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold text-start">
               Welcome !
@@ -69,6 +71,7 @@ const SignUpPage: React.FC = () => {
           <CardContent>
             <form onSubmit={onSubmit}>
               <div className="flex flex-col gap-6">
+
                 <div className="grid gap-2">
                   <Label htmlFor="username">Username</Label>
                   <Input
@@ -80,6 +83,7 @@ const SignUpPage: React.FC = () => {
                     onChange={(e) => setUsername(e.target.value)}
                   />
                 </div>
+
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -91,8 +95,9 @@ const SignUpPage: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
+
                 <div className="grid gap-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
                     <Label htmlFor="password">Password</Label>
                   </div>
                   <div className="relative">
@@ -110,19 +115,16 @@ const SignUpPage: React.FC = () => {
                       onPressedChange={setShowPassword}
                       className="absolute right-2 top-1/2 -translate-y-1/2"
                     >
-                      {showPassword ? (
-                        <Eye className="w-4 h-4" />
-                      ) : (
-                        <EyeOff className="w-4 h-4" />
-                      )}
+                      {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </Toggle>
                   </div>
-                  <div className="flex items-center justify-between mt-3">
-                    <Label htmlFor="password">Confirm Password</Label>
+
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mt-3">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
                   </div>
                   <div className="relative">
                     <Input
-                      id="password"
+                      id="confirmPassword"
                       type={showPassword ? "text" : "password"}
                       required
                       className="pr-10"
@@ -135,21 +137,15 @@ const SignUpPage: React.FC = () => {
                       onPressedChange={setShowPassword}
                       className="absolute right-2 top-1/2 -translate-y-1/2"
                     >
-                      {showPassword ? (
-                        <Eye className="w-4 h-4" />
-                      ) : (
-                        <EyeOff className="w-4 h-4" />
-                      )}
+                      {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </Toggle>
                   </div>
                 </div>
               </div>
-              {error ? (
-                <p className="text-red-600 text-sm mt-4">{error}</p>
-              ) : null}
-              {success ? (
-                <p className="text-green-600 text-sm mt-4">{success}</p>
-              ) : null}
+
+              {error && <p className="text-red-600 text-sm mt-4">{error}</p>}
+              {success && <p className="text-green-600 text-sm mt-4">{success}</p>}
+
               <CardFooter className="flex flex-col mt-10 px-0 w-full">
                 <Button
                   type="submit"
@@ -161,6 +157,7 @@ const SignUpPage: React.FC = () => {
               </CardFooter>
             </form>
           </CardContent>
+
           <CardContent className="flex items-center justify-center">
             <CardAction className="text-center items-center">
               <Button variant="link">
@@ -169,16 +166,17 @@ const SignUpPage: React.FC = () => {
             </CardAction>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Image Section */}
-      <section className="flex justify-center items-center">
-        <img
-          src={loginImg}
-          alt="DreamNeighbourhood illustration"
-          className="max-w-full h-auto rounded-lg"
-        />
-      </section>
+        {/* Illustration */}
+        <div className="hidden md:flex justify-center items-center flex-shrink-0 flex-grow max-w-[calc(50%-2rem)] lg:max-w-[45%]">
+          <img
+            src={loginImg}
+            alt="DreamNeighbourhood illustration"
+            className="w-full h-auto max-w-[380px]"
+          />
+        </div>
+
+      </div>
     </div>
   );
 };

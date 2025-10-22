@@ -1,3 +1,4 @@
+/*
 import { calculateBoundingBox } from '../utils/Filters.js';
 import { oneMapSearch } from '../utils/oneMapRequest.js';
 
@@ -15,4 +16,4 @@ const drawMapBoundaries = async (coords) => {
 }
 
 export const boundaries = await drawMapBoundaries(coords);
-
+*/

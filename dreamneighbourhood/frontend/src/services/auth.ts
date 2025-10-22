@@ -1,5 +1,13 @@
 // Simple auth client for users API
-export type LoginResponse = { message: string; token: string };
+export type LoginResponse = {
+  token: string;
+  user: {
+    id: string;
+    username: string;
+    email: string;
+    is_verified: boolean;
+  };
+};
 export type RegisterResponse = {
   message: string;
   user: { id: number; username: string; email: string };
@@ -36,10 +44,19 @@ async function apiRequest<T>(
 
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
-  return apiRequest<LoginResponse>("/users/login", {
+  const res = await fetch(`${API_BASE}/users/login`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
+
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.message || "Login failed");
+  }
+
+  const data: LoginResponse = await res.json();
+  return data;
 }
 
 export async function register(

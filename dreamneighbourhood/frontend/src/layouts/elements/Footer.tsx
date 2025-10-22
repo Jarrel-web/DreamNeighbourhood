@@ -25,46 +25,7 @@ const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
-              Quick Links
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  to={routes.home}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={routes.propertiesSearch}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Search Properties
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={routes.favourites}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Favourites
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={routes.account}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  My Account
-                </Link>
-              </li>
-            </ul>
-          </div>
+         
 
           {/* Contact Info
           <div>

@@ -1,83 +1,74 @@
-import { Link } from "react-router-dom";
 import bannerImg from "../assets/images/Banner.png";
-import { routes } from "../routes/config";
-import { Button } from "@/components/ui/button";
-
+import { MapPin, Search, Home } from "lucide-react";
+import PropertiesSearchSection from "../components/PropertiesSearchSection";
 function HomePage() {
   return (
     <div>
       {/* Hero Section with Background */}
-      <section
-        className="relative h-[60vh] w-full flex flex-col items-start justify-center text-start text-white"
-        style={{
-          backgroundImage: `url(${bannerImg})`,
-          backgroundSize: "auto",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        {/* Content */}
-        <div className="relative z-0 px-4 sm:px-6 lg:px-12 w-[500px] ml-90">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-blue">
-            Find Your Dream Home, Where It Matters Most
-          </h1>
-          <p className="text-lg sm:text-xl text-black mb-8 max-w-2xl">
-            Search properties by price, location, and nearby amenities —
-            tailored to your lifestyle.
-          </p>
+      <section className="relative w-full flex items-center justify-center overflow-hidden">
+  {/* Hero Image */}
+  <img
+    src={bannerImg}
+    alt="Dream Neighbourhood Banner"
+    className="w-full h-auto object-cover"
+  />
 
-          {/* Search Button */}
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className="bg-white text-light-blue hover:bg-blue-50"
-          >
-            <Link to={routes.propertiesSearch}>Search Now</Link>
-          </Button>
-        </div>
-      </section>
+  {/* Overlay for readability */}
+  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
 
-      {/* Info Cards Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          <Link to={routes.properties} className="block">
-            <div className="bg-card p-6 rounded-lg shadow-l border hover:shadow-md transition-shadow">
-              <h3 className="text-lg font-semibold mb-2">Browse Properties</h3>
-              <p className="text-muted-foreground text-sm">
-                Explore our extensive collection of properties and find your
-                perfect match.
-              </p>
-            </div>
-          </Link>
+  {/* Text Content */}
+  <div className="absolute inset-0 flex flex-col items-start justify-center px-4 sm:px-8 lg:px-12">
+    <h1 className="text-blue-600 font-bold drop-shadow-md mb-2
+                   text-xl sm:text-3xl md:text-4xl lg:text-5xl
+                   max-w-full sm:max-w-[90%] md:max-w-[80%] leading-snug">
+      Find Your Dream Home,<br />
+      Where It Matters Most
+    </h1>
 
-          <Link to={routes.propertiesSearch} className="block">
-            <div className="bg-card p-6 rounded-lg shadow-l border hover:shadow-md transition-shadow">
-              <h3 className="text-lg font-semibold mb-2">Advanced Search</h3>
-              <p className="text-muted-foreground text-sm">
-                Use our powerful search tools to filter properties by your
-                specific criteria.
-              </p>
-            </div>
-          </Link>
+    <p className="text-white drop-shadow-sm
+                  text-sm sm:text-base md:text-lg lg:text-xl
+                  max-w-full sm:max-w-[90%] md:max-w-[80%] leading-snug">
+      Search properties by price, location,<br />
+      and nearby amenities — tailored to your lifestyle.
+    </p>
+  </div>
+</section>
 
-          <Link to={routes.propertiesMap} className="block">
-            <div className="bg-card p-6 rounded-lg shadow-l border hover:shadow-md transition-shadow">
-              <h3 className="text-lg font-semibold mb-2">Map View</h3>
-              <p className="text-muted-foreground text-sm">
-                View properties on an interactive map to see their exact
-                location and surroundings.
-              </p>
-            </div>
-          </Link>
-        </div>
-      </div>
-      {/*Favorites Section*/}
-      <div className="bg-card p-6 sm:p-8 rounded-lg shadow-sm border max-w-7xl mx-auto flex items-center justify-center">
-        <p className="text-muted-foreground text-sm sm:text-base text-center">
-          Your favourite properties displayed here.
-        </p>
-      </div>
+
+      {/* Features Section */}
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+  <h2 className="text-2xl font-bold mb-6 text-center">Our Features</h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+
+    <div className="bg-card p-6 rounded-lg shadow-l border flex flex-col items-start gap-3">
+      <Home className="w-8 h-8 text-blue-600" />
+      <h3 className="text-lg font-semibold mb-1">Browse Properties</h3>
+      <p className="text-muted-foreground text-sm">
+        Explore our extensive collection of properties and find your perfect match.
+      </p>
+    </div>
+
+    <div className="bg-card p-6 rounded-lg shadow-l border flex flex-col items-start gap-3">
+      <Search className="w-8 h-8 text-blue-600" />
+      <h3 className="text-lg font-semibold mb-1">Advanced Search</h3>
+      <p className="text-muted-foreground text-sm">
+        Use our powerful search tools to filter properties by your specific criteria.
+      </p>
+    </div>
+
+    <div className="bg-card p-6 rounded-lg shadow-l border flex flex-col items-start gap-3">
+      <MapPin className="w-8 h-8 text-blue-600" />
+      <h3 className="text-lg font-semibold mb-1">Map View</h3>
+      <p className="text-muted-foreground text-sm">
+        View properties on an interactive map to see their exact location and surroundings.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+      {/* Property Search Section */}
+      <PropertiesSearchSection />
     </div>
   );
 }
