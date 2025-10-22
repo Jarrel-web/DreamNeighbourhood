@@ -13,20 +13,27 @@ const fetchNewToken = async () => {
     throw new Error("OneMap credentials missing in .env");
   }
 
+  const requestData = {
+    email: process.env.ONEMAP_EMAIL,
+    password: process.env.ONEMAP_EMAIL_PASSWORD
+  }
+
   try {
-    const res = await axios.post("https://www.onemap.gov.sg/api/auth/post/getToken", {
-      email: process.env.ONEMAP_EMAIL,
-      password: process.env.ONEMAP_EMAIL_PASSWORD,
+    const res = await axios.post("https://www.onemap.gov.sg/api/auth/post/getToken", 
+      requestData,{
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
 
-    const data = res.data;
+    const responseData = res.data;
 
-    if (!data.access_token || !data.expiry_timestamp) {
+    if (!responseData.access_token || !responseData.expiry_timestamp) {
       throw new Error("Invalid token response from OneMap");
     }
 
-    token = data.access_token;
-    tokenExpiry = data.expiry_timestamp; // Unix timestamp
+    token = responseData.access_token;
+    tokenExpiry = responseData.expiry_timestamp; // Unix timestamp
     console.log("✅ OneMap token fetched");
 
     return token;
