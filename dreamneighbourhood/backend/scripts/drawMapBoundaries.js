@@ -2,18 +2,34 @@ import { calculateBoundingBox } from '../utils/Filters.js';
 import { oneMapSearch } from '../utils/oneMapRequest.js';
 import {pool} from "../config/db.js";
 
-const data = await oneMapSearch('public/popapi/getAllPlanningarea');
-const coords = data.SearchResults;
+
+const fetchPlanningAreas = async () => {
+    try {
+        const data = await oneMapSearch('public/popapi/getAllPlanningarea');
+        if (!data?.SearchResults) {
+            throw new Error("Invalid Response from OneMap");
+        }
+        return data.SearchResults;
+    } catch (error) {
+        console.error("Error fetching planning areas: ", error.message);
+        throw error;
+    }
+}
 
 // Func to determine the coordinates for the bounding box of each planning area.
 // Stores the result in a dict with area name as key and bounding coords as an array of 2 value pairs
 const drawMapBoundaries = async (coords) => {
     let mapBoundaries = {};
     for (let i = 0; i < coords.length; i++) {
+        try {
         const name = coords[i].pln_area_n;
         const points = JSON.parse(coords[i].geojson).coordinates.flat(2);
         const boundingBox = calculateBoundingBox(points);
         mapBoundaries[name] = boundingBox;
+        } catch (error) {
+            console.error(`Error processing area ${coords[i].pln_area_n}`);
+            throw error;
+        }
     }
     return mapBoundaries;
 }
@@ -78,7 +94,9 @@ export const getBoundaries = async(district='') => {
 
 const main = async () => {
     try {
+        console.log("Starting map boundary db setup");
         await createTable();
+        const coords = await fetchPlanningAreas();
         const boundaries = await drawMapBoundaries(coords);
         await insertBoundaries(boundaries);
         console.log("🎉 Map boundaries setup complete!");

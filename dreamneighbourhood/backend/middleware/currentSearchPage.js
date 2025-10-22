@@ -2,6 +2,8 @@ import {pool} from "../config/db.js";
 
 // Function to retrieve the most recent search page and query from the db
 // For a given user_id. 
+
+/* 
 export const getCurrentSearchPage = async (req, res) => {
     try {
         const userId = req.user_id;
@@ -15,7 +17,9 @@ export const getCurrentSearchPage = async (req, res) => {
             FROM search_cache 
             WHERE user_id = $1
         `, [userId]);
-        const lastSearchPage = await pool.query(``)
+        const lastSearchPage = await pool.query(`
+            SELECT 
+            `)
         
         
     } catch (error) {
@@ -27,3 +31,4 @@ export const getCurrentSearchPage = async (req, res) => {
 export const cacheSearchPage = async (req, res) => {
 
 }
+*/
