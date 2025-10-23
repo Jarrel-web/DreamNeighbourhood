@@ -6,7 +6,7 @@ import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import PropertiesPage from "../pages/PropertiesPage";
 import PropertiesSearchPage from "../components/PropertiesSearchSection";
-import PropertiesMapPage from "../pages/PropertiesMapPage";
+
 import FavouritesPage from "../pages/FavouritesPage";
 import ErrorPage from "@/pages/ErrorPage";
 import ProfilePage from "@/pages/ProfilePage";
@@ -21,9 +21,9 @@ export const routerConfig = createBrowserRouter([
     children: [
       { path: routes.home, Component: HomePage },
       { path: routes.loginIn, Component: LoginPage },
-      { path: routes.properties, Component: PropertiesPage },
+      { path: routes.propertyDetails, Component: PropertiesPage },
       { path: routes.propertiesSearch, Component: PropertiesSearchPage },
-      { path: routes.propertiesMap, Component: PropertiesMapPage },
+      
       {
         path: routes.favourites,
         Component: () =>

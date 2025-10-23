@@ -3,7 +3,7 @@ import { RouterProvider } from "react-router-dom";
 import { routerConfig } from "./routes";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
-import { FavouritesProvider } from "./context/favouriteContext";
+import { FavouritesProvider } from "./context/FavouriteContext"; // ✅ import this
 import "./index.css";
 import useSessionTimeout from "./hooks/useSessionTimeout";
 

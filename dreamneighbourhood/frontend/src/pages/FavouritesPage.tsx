@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropertyCard from "../components/ui/property-card";
 import Pager from "../components/ui/pager";
-import { useFavourites } from "../context/favouriteContext";
+import { useFavourites } from "../context/FavouriteContext";
 
 const PAGE_SIZE = 10;
 
