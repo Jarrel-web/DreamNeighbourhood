@@ -5,14 +5,25 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import { FavouritesProvider } from "./context/FavouriteContext"; // ✅ import this
 import "./index.css";
+import useSessionTimeout from "./hooks/useSessionTimeout";
+
+function Root() {
+  useSessionTimeout();
+
+  return (
+    <>
+      <RouterProvider router={routerConfig} />
+      <Toaster position="top-center" reverseOrder={false} />
+    </>
+  );
+}
 
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
   <AuthProvider>
-    <FavouritesProvider> {/* ✅ Wrap inside AuthProvider */}
-      <RouterProvider router={routerConfig} />
-      <Toaster position="top-center" reverseOrder={false} />
+    <FavouritesProvider>
+      <Root />
     </FavouritesProvider>
   </AuthProvider>
 );

@@ -12,7 +12,9 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const storedUsername = localStorage.getItem("username");
       if (storedUsername) setUsername(storedUsername);
     }
-    setLoading(false); 
+    setLoading(false);
   }, []);
 
   const loginUser = (token: string, username: string) => {
@@ -42,7 +44,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, username, loginUser, logoutUser, loading }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, username, loginUser, logoutUser, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
