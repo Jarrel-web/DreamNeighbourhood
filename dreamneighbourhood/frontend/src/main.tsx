@@ -3,16 +3,27 @@ import { RouterProvider } from "react-router-dom";
 import { routerConfig } from "./routes";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
-import { FavouritesProvider } from "./context/favouriteContext"; // ✅ import this
+import { FavouritesProvider } from "./context/favouriteContext";
 import "./index.css";
+import useSessionTimeout from "./hooks/useSessionTimeout";
+
+function Root() {
+  useSessionTimeout();
+
+  return (
+    <>
+      <RouterProvider router={routerConfig} />
+      <Toaster position="top-center" reverseOrder={false} />
+    </>
+  );
+}
 
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
   <AuthProvider>
-    <FavouritesProvider> {/* ✅ Wrap inside AuthProvider */}
-      <RouterProvider router={routerConfig} />
-      <Toaster position="top-center" reverseOrder={false} />
+    <FavouritesProvider>
+      <Root />
     </FavouritesProvider>
   </AuthProvider>
 );
