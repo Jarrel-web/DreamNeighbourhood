@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import type { Property } from "../../types/property";
 import stockImg from "../../assets/images/stock-photo.png";
 import { Heart } from "lucide-react";
-import { useFavourites } from "../../context/favouriteContext";
+import { useFavourites } from "../../context/FavouriteContext";
 import { useAuth } from "../../context/AuthContext";
 
 interface PropertyCardProps {

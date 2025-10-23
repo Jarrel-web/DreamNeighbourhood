@@ -4,7 +4,7 @@ import PropertyCard from "../components/ui/property-card";
 import Pager from "../components/ui/pager";
 import { Search } from "lucide-react";
 import type { Property } from "../types/property";
-import { useFavourites } from "../context/favouriteContext";
+import { useFavourites } from "../context/FavouriteContext";
 import { useAuth } from "../context/AuthContext";
 
 const PAGE_SIZE = 10;
