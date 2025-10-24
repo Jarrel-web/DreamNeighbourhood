@@ -69,8 +69,8 @@ const PropertiesSearchSection: React.FC = () => {
       setTotalResults(data.total || propertiesWithFav.length);
       setTotalPages(data.totalPages || Math.ceil((data.total || propertiesWithFav.length) / PAGE_SIZE));
 
-      // Scroll to top only for new searches or page 1
-      if (isNewSearch || pageNumber === 1) {
+      // Only scroll to top for NEW searches, not for page navigation
+      if (isNewSearch) {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch (err: any) {
@@ -83,12 +83,12 @@ const PropertiesSearchSection: React.FC = () => {
   // Load initial page
   React.useEffect(() => {
     fetchPageData(1, true);
-  }, [isLoggedIn, favourites]); // Initial load and when auth/favourites change
+  }, [isLoggedIn, favourites]);
 
   // Handle page changes
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    fetchPageData(newPage, false);
+    fetchPageData(newPage, false); 
   };
 
   // Handle search/filter changes with debounce
@@ -97,11 +97,11 @@ const PropertiesSearchSection: React.FC = () => {
       // Reset to page 1 when filters change
       if (page !== 1) {
         setPage(1);
-        fetchPageData(1, true);
+        fetchPageData(1, true); // Scroll for new searches
       } else {
-        fetchPageData(1, true);
+        fetchPageData(1, true); // Scroll for new searches
       }
-    }, 500); // Increased debounce time for better UX
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [searchText, queryTown, maxPrice, minRooms, minArea]);
@@ -110,12 +110,10 @@ const PropertiesSearchSection: React.FC = () => {
   const handleManualSearch = () => {
     // Reset to page 1 and fetch
     setPage(1);
-    fetchPageData(1, true);
+    fetchPageData(1, true); // Scroll for manual searches
   };
 
-  // Get unique towns from all available data (you might want to get this from a separate endpoint)
-  // For now, we'll use a static list or keep it empty since we don't have all data
-  const towns: string[] = []; // You might want to fetch this separately
+  
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
