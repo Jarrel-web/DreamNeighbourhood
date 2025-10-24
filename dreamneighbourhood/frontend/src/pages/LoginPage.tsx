@@ -7,7 +7,7 @@ import loginImg from "../assets/images/Login.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
-import { login } from "@/services/auth";
+import { login } from "@/services/authService";
 import { useAuth } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {

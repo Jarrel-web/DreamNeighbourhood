@@ -16,8 +16,7 @@ export type Property = {
     latitude?: number;
     longitude?: number;
     isInitiallyFavourite?: boolean;
-    // derived fields
-    rooms: number;
     address_line: string;
+    description?: string;
 };
   

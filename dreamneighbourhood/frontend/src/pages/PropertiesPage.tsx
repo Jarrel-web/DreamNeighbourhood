@@ -1,22 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
-interface Property {
-  id: number;
-  block: string;
-  street_name: string;
-  town: string;
-  flat_type: string;
-  floor_area_sqm: number;
-  storey_range: string;
-  flat_model: string;
-  remaining_lease: string;
-  postal_code: string;
-  resale_price: number;
-  latitude: number;
-  longitude: number;
-  description?: string;
-}
+import { getPropertyById } from "@/services/propertiesService";
+import type { Property } from "@/types/property";
 
 const PropertyDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,32 +10,28 @@ const PropertyDetailsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [iframeKey, setIframeKey] = useState(0);
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
   useEffect(() => {
     const fetchProperty = async () => {
       if (!id) return;
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`${API_BASE}/properties/${id}`);
-        if (!response.ok) throw new Error("Failed to fetch property details");
-        const data = await response.json();
+        const data = await getPropertyById(id);
         setProperty(data);
         setIframeKey(prev => prev + 1);
       } catch (err: any) {
-        setError(err.message || "Something went wrong");
+        setError(err.message || "Failed to fetch property details");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProperty();
-  }, [id, API_BASE]);
+  }, [id]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-[60vh] pt-20"> {/* Added pt-20 */}
+      <div className="flex justify-center items-center h-[60vh] pt-20">
         <p className="text-gray-600 text-lg">Loading property details...</p>
       </div>
     );
@@ -58,7 +39,7 @@ const PropertyDetailsPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-[60vh] pt-20"> {/* Added pt-20 */}
+      <div className="flex justify-center items-center h-[60vh] pt-20">
         <p className="text-red-600 font-semibold">{error}</p>
       </div>
     );
@@ -72,8 +53,8 @@ const PropertyDetailsPage: React.FC = () => {
     `&mapType=Hybrid`;
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20"> {/* Added pt-20 for top padding */}
-      <div className="flex items-center justify-center p-4"> {/* Removed min-h-screen from here */}
+    <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="flex items-center justify-center p-4">
         <div className="w-full max-w-7xl mx-auto">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-12 items-stretch">
             

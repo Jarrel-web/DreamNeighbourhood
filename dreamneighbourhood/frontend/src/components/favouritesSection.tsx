@@ -2,11 +2,11 @@ import React from "react";
 import PropertyCard from "../components/ui/property-card";
 import Pager from "../components/ui/pager";
 import type { Property } from "../types/property";
-import { useFavourites } from "../context/favouriteContext";
+import { useFavourites } from "../context/FavouriteContext";
 import { useAuth } from "../context/AuthContext";
+import { getFavouriteProperties } from "@/services/favouriteServices";
 
 const PAGE_SIZE = 10;
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const FavouritesSection: React.FC = () => {
   const { favourites } = useFavourites();
@@ -29,22 +29,13 @@ const FavouritesSection: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch details for favourited properties
-        const res = await fetch(`${API_BASE}/favourites/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ propertyIds: favourites }),
-        });
-
-        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-
-        const data = await res.json();
-        // Map to include isInitiallyFavourite
-        const propsWithFav: Property[] = (data.results || []).map((p: Property) => ({
+        // Use the service to get favourite properties with full details
+        const favouriteProperties = await getFavouriteProperties();
+        
+        // All properties returned are favourited, so mark them as such
+        const propsWithFav: Property[] = favouriteProperties.map((p: Property) => ({
           ...p,
-          isInitiallyFavourite: true, // all are favourited
+          isInitiallyFavourite: true,
         }));
 
         setProperties(propsWithFav);
@@ -68,13 +59,21 @@ const FavouritesSection: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold mb-6">Your Favourite Properties</h1>
 
-      {loading && <div>Loading…</div>}
+      {loading && <div className="text-gray-600">Loading…</div>}
       {error && <div className="text-amber-600">{error}</div>}
-      {!loading && current.length === 0 && <div>No favourite properties yet.</div>}
+      {!loading && current.length === 0 && (
+        <div className="text-muted-foreground">
+          {isLoggedIn ? "No favourite properties yet." : "Please log in to view your favourites."}
+        </div>
+      )}
 
       <div className="space-y-4">
         {current.map((p) => (
-          <PropertyCard key={p.id} property={p} />
+          <PropertyCard 
+            key={p.id} 
+            property={p} 
+            isInitiallyFavourite={true}
+          />
         ))}
       </div>
 

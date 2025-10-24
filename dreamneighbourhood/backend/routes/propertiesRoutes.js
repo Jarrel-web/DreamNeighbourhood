@@ -1,11 +1,14 @@
 import express from "express";
-import { getDefaultProperties,getPropertyById} from "../controllers/propertiesController.js";
+import {
+  getDefaultProperties,
+  getPropertyById,
+  searchProperties
+} from "../controllers/propertiesController.js"; 
 
 const router = express.Router();
 
-
 router.get("/default", getDefaultProperties);
-
-router.get("/:id",getPropertyById);
+router.get("/search", searchProperties);
+router.get("/:id", getPropertyById);
 
 export default router;

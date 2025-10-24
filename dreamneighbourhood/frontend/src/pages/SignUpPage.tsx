@@ -15,7 +15,7 @@ import loginImg from "../assets/images/Login.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
-import { register } from "@/services/auth";
+import { register } from "@/services/authService";
 
 const SignUpPage: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { getToken, saveToken, clearToken } from "../services/auth";
+import { getToken, saveToken, clearToken } from "../services/tokenService";
 
 type AuthContextType = {
   isLoggedIn: boolean;

@@ -16,7 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import resetPasswordImg from "../assets/images/resetPassword.png";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-// import { sendVerificationEmail } from "@/services/auth";
+import { forgotPassword } from "@/services/authService";
 
 const ForgetPasswordPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -26,17 +26,16 @@ const ForgetPasswordPage: React.FC = () => {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitting(true);
+    
     try {
-      console.log(email);
-      // await sendVerificationEmail(email);
-      toast.success("Check your email to verify your account");
+      await forgotPassword(email);
+      toast.success("Password reset email sent! Check your inbox.");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send email");
+      toast.error(err instanceof Error ? err.message : "Failed to send reset email");
     } finally {
       setSubmitting(false);
     }
-    
   }
 
   return (
@@ -56,7 +55,7 @@ const ForgetPasswordPage: React.FC = () => {
               Reset your password!
             </CardTitle>
             <CardDescription className="text-start text-xl font-semi-bold">
-              Sign Up to Dream Neighbourhood
+              Enter your email to reset your password
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -80,7 +79,7 @@ const ForgetPasswordPage: React.FC = () => {
                   className="bg-light-blue text-white hover:bg-blue-300 w-full"
                   disabled={submitting}
                 >
-                  {submitting ? "Sending..." : "Send verification email"}
+                  {submitting ? "Sending..." : "Send Reset Link"}
                 </Button>
               </CardFooter>
             </form>
@@ -88,7 +87,7 @@ const ForgetPasswordPage: React.FC = () => {
           <CardContent className="flex items-center justify-center">
             <CardAction className="text-center items-center">
               <Button variant="link">
-                <Link to="/login">Already have an account? Login here</Link>
+                <Link to="/login">Back to Login</Link>
               </Button>
             </CardAction>
           </CardContent>

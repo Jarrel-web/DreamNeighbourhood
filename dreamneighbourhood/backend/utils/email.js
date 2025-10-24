@@ -47,3 +47,30 @@ export const sendVerificationEmail = async (toEmail,username, verificationToken)
     throw err;
   }
 };
+
+export const sendResetPasswordEmail = async (toEmail, username, resetToken) => {
+  try {
+    const url = `${process.env.FRONTEND_URL}/resetPassword?token=${resetToken}`;
+    await transporter.sendMail({
+      from: `"DreamNeighbourhood" <${process.env.EMAIL_USER}>`,
+      to: toEmail,
+      subject: "Reset Your Password",
+      html: `
+      <p>Hi ${username},</p>
+      <p>Click the button below to reset your password:</p>
+      <a href="${url}" style="
+          background-color:#2563eb;
+          color:#fff;
+          padding:10px 18px;
+          text-decoration:none;
+          border-radius:6px;
+        ">Reset Password</a>
+      <p>If you didn't request this, ignore this email.</p>
+      `
+    });
+    console.log("Reset password email sent to", toEmail);
+  } catch (err) {
+    console.error("Error sending reset email:", err);
+    throw err;
+  }
+};

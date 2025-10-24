@@ -4,6 +4,7 @@ export const routes = {
   loginIn: "/login",
   signUp: "/signup",
   forgotPassword: "/forgotPassword",
+  resetPassword: "/resetPassword", 
   propertyDetails: "/property/:id",
   properties: "/properties",
   propertiesSearch: "/properties/search",

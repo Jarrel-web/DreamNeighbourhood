@@ -1,33 +1,40 @@
 import { pool } from "../config/db.js";
 
+// GET if property is favourite
 export const getFavouriteProperty = async (req, res) => {
   try {
     const userId = req.user.id;
     const propertyId = req.params.propertyId;
 
-    const result = await pool.query(
-      "SELECT * FROM user_favorites WHERE user_id = $1 AND property_id = $2",
-      [userId, propertyId]
-    );
+    const { data, error } = await pool
+      .from("user_favorites")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("property_id", propertyId);
 
-    res.status(200).json({
-      isFavourite: result.rows.length > 0, // true if exists
-    });
+    if (error) throw error;
+
+    res.status(200).json({ isFavourite: data.length > 0 });
   } catch (error) {
     console.error("Error fetching favourite:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// GET all favourite properties
 export const viewFavoriteProperty = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const result = await pool.query(
-      "SELECT p.* FROM user_favorites uf INNER JOIN properties p ON uf.property_id = p.id WHERE uf.user_id = $1 ORDER BY uf.created_at DESC",
-      [userId]
-    );
+    const { data, error } = await pool
+      .from("user_favorites")
+      .select("*, properties(*)")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
-    if (result.rows.length === 0) {
+    if (error) throw error;
+
+    if (data.length === 0) {
       return res.status(200).json({
         favourites: [],
         message: "You have no favourite properties yet.",
@@ -35,7 +42,7 @@ export const viewFavoriteProperty = async (req, res) => {
     }
 
     res.status(200).json({
-      favourites: result.rows,
+      favourites: data.map(fav => fav.properties),
       message: "Favourites retrieved successfully.",
     });
   } catch (error) {
@@ -44,74 +51,80 @@ export const viewFavoriteProperty = async (req, res) => {
   }
 };
 
-
+// POST add favourite
 export const addFavoriteProperty = async (req, res) => {
   try {
-    const userId = req.user.id; // Extract user ID (to refer to the db)
-    const propertyId = req.body.propertyId; // Extract property address 
+    const userId = req.user.id;
+    const { propertyId } = req.body;
 
-    if (!propertyId) {
-      return res.status(400).json({ message: "Property address is required." });
-    }
+    if (!propertyId)
+      return res.status(400).json({ message: "Property ID is required" });
 
-    // Check if property exists
-    const propertyExists = await pool.query(
-      "SELECT id FROM properties WHERE id = $1",
-      [propertyId]
-    );
-    if (propertyExists.rowCount === 0) {
-      return res.status(404).json({ message: "Property not found." });
-    }
+    // Check property exists
+    const { data: propData, error: propError } = await pool
+      .from("properties")
+      .select("id")
+      .eq("id", propertyId)
+      .single();
 
+    if (propError || !propData)
+      return res.status(404).json({ message: "Property not found" });
 
-    // Check if the property already exists by matching user and address.
-    const existingFavorite = await pool.query(
-      "SELECT * FROM user_favorites WHERE user_id = $1 AND property_id = $2",
-      [userId, propertyId]
-    );
+    // Check existing favourite
+    const { data: favData, error: favError } = await pool
+      .from("user_favorites")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("property_id", propertyId);
 
-    if (existingFavorite.rows.length > 0) {
-      return res.status(400).json({ message: "Property is already in favorites" });
-    }
+    if (favError) throw favError;
+    if (favData.length > 0)
+      return res.status(400).json({ message: "Property already in favourites" });
 
-    // Add the property to the user's favorites
-    await pool.query(
-      "INSERT INTO user_favorites (user_id, property_id) VALUES ($1, $2)",
-      [userId, propertyId]
-    );
+    // Insert favourite
+    const { error: insertError } = await pool
+      .from("user_favorites")
+      .insert([{ user_id: userId, property_id: propertyId }]);
 
-    res.status(201).json({ message: "Property added to favorites" });
+    if (insertError) throw insertError;
+
+    res.status(201).json({ message: "Property added to favourites" });
   } catch (error) {
-    console.error("Error adding favorite property:", error.message);
+    console.error("Error adding favourite:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
+// DELETE remove favourite
 export const removeFavoriteProperty = async (req, res) => {
   try {
     const userId = req.user.id;
-    const property_id = req.params.property_id;
+    const propertyId = req.params.property_id;
 
-     if (!property_id) {
-      return res.status(400).json({ message: "Property Address is required." });
-    }
+    if (!propertyId)
+      return res.status(400).json({ message: "Property ID is required" });
 
-    // Check if favourite exists in database
-    const favCheck = await pool.query(
-      "SELECT * FROM user_favorites WHERE user_id = $1 AND property_id = $2",
-      [userId, property_id]
-    );
-    if (favCheck.rowCount === 0) {
-      return res.status(404).json({ message: "Favourite not found." });
-    }
+    // Check favourite exists
+    const { data: favData, error: favError } = await pool
+      .from("user_favorites")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("property_id", propertyId);
 
-    // Remove favourite
-    await pool.query(
-      "DELETE FROM user_favorites WHERE user_id = $1 AND property_id = $2",
-      [userId, property_id]
-    );
+    if (favError) throw favError;
+    if (favData.length === 0)
+      return res.status(404).json({ message: "Favourite not found" });
 
-    res.status(200).json({ message: "Removed from favourites successfully." });
+    // Delete favourite
+    const { error: delError } = await pool
+      .from("user_favorites")
+      .delete()
+      .eq("user_id", userId)
+      .eq("property_id", propertyId);
+
+    if (delError) throw delError;
+
+    res.status(200).json({ message: "Removed from favourites successfully" });
   } catch (error) {
     console.error("Error removing favourite:", error);
     res.status(500).json({ message: "Server error" });

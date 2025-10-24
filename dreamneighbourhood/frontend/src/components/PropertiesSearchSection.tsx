@@ -6,12 +6,12 @@ import { Search } from "lucide-react";
 import type { Property } from "../types/property";
 import { useFavourites } from "../context/FavouriteContext";
 import { useAuth } from "../context/AuthContext";
+import { getDefaultProperties, searchProperties, type SearchParams, type PropertiesResponse } from "@/services/propertiesService";
 
 const PAGE_SIZE = 10;
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const PropertiesSearchSection: React.FC = () => {
-  const [all, setAll] = React.useState<Property[]>([]);
+  const [currentPageData, setCurrentPageData] = React.useState<Property[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -21,74 +21,101 @@ const PropertiesSearchSection: React.FC = () => {
   const [minRooms, setMinRooms] = React.useState<number | null>(null);
   const [minArea, setMinArea] = React.useState<number | null>(null);
   const [page, setPage] = React.useState(1);
+  const [totalResults, setTotalResults] = React.useState(0);
+  const [totalPages, setTotalPages] = React.useState(1);
 
-  const { favourites } = useFavourites();
+  const { favourites, isFavourite } = useFavourites();
   const { isLoggedIn } = useAuth();
 
   // Helper: mark which properties are favourited
   const addFavouriteFlag = (properties: Property[]) =>
-  properties.map((p) => ({
-    ...p,
-    isInitiallyFavourite: isLoggedIn ? favourites.some((f) => f.id === p.id) : false,
-  }));
+    properties.map((p) => ({
+      ...p,
+      isInitiallyFavourite: isLoggedIn ? isFavourite(p.id) : false,
+    }));
 
-  // Load initial properties
-  React.useEffect(() => {
-    const fetchInitial = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${API_BASE}/properties/default`);
-        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-        const data = await res.json();
-        setAll(addFavouriteFlag(data.results || []));
-      } catch (err: any) {
-        setError(err.message || "Failed to load properties.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchInitial();
-  }, [isLoggedIn, favourites]);
+  // Fetch data for the current page
+  const fetchPageData = async (pageNumber: number, isNewSearch: boolean = false) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  // Fetch filtered results
-  React.useEffect(() => {
-    const fetchFiltered = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      const searchParams: SearchParams = {
+        searchText,
+        town: queryTown,
+        maxPrice: maxPrice || undefined,
+        minRooms: minRooms || undefined,
+        minArea: minArea || undefined,
+        page: pageNumber,
+        pageSize: PAGE_SIZE,
+      };
 
-        const queryParams = new URLSearchParams();
-        if (searchText) queryParams.append("searchText", searchText);
-        if (queryTown) queryParams.append("town", queryTown);
-        if (maxPrice !== null) queryParams.append("maxPrice", String(maxPrice));
-        if (minRooms !== null) queryParams.append("minRooms", String(minRooms));
-        if (minArea !== null) queryParams.append("minArea", String(minArea));
+      // Determine if we're doing a filtered search or getting default properties
+      const hasFilters = Object.values({
+        searchText,
+        town: queryTown,
+        maxPrice,
+        minRooms,
+        minArea,
+      }).some(value => value !== undefined && value !== "" && value !== null);
 
-        if (queryParams.toString() === "") return;
+      const data: PropertiesResponse = hasFilters 
+        ? await searchProperties(searchParams)
+        : await getDefaultProperties(pageNumber, PAGE_SIZE);
 
-        const res = await fetch(`${API_BASE}/properties/search?${queryParams.toString()}`);
-        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-        const data = await res.json();
+      // Update state with the new page data
+      const propertiesWithFav = addFavouriteFlag(data.results || []);
+      setCurrentPageData(propertiesWithFav);
+      setTotalResults(data.total || propertiesWithFav.length);
+      setTotalPages(data.totalPages || Math.ceil((data.total || propertiesWithFav.length) / PAGE_SIZE));
 
-        setAll(addFavouriteFlag(data.results || []));
-        setPage(1);
+      // Scroll to top only for new searches or page 1
+      if (isNewSearch || pageNumber === 1) {
         window.scrollTo({ top: 0, behavior: "smooth" });
-      } catch (err: any) {
-        setError(err.message || "Failed to load properties.");
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err: any) {
+      setError(err.message || "Failed to load properties.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchFiltered();
-  }, [searchText, queryTown, maxPrice, minRooms, minArea, isLoggedIn, favourites]);
+  // Load initial page
+  React.useEffect(() => {
+    fetchPageData(1, true);
+  }, [isLoggedIn, favourites]); // Initial load and when auth/favourites change
 
-  // Pagination
-  const pageCount = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
-  const start = (page - 1) * PAGE_SIZE;
-  const current = all.slice(start, start + PAGE_SIZE);
+  // Handle page changes
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    fetchPageData(newPage, false);
+  };
 
-  const towns = Array.from(new Set(all.map((p) => p.town))).sort();
+  // Handle search/filter changes with debounce
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Reset to page 1 when filters change
+      if (page !== 1) {
+        setPage(1);
+        fetchPageData(1, true);
+      } else {
+        fetchPageData(1, true);
+      }
+    }, 500); // Increased debounce time for better UX
+
+    return () => clearTimeout(timeoutId);
+  }, [searchText, queryTown, maxPrice, minRooms, minArea]);
+
+  // Manual search handler
+  const handleManualSearch = () => {
+    // Reset to page 1 and fetch
+    setPage(1);
+    fetchPageData(1, true);
+  };
+
+  // Get unique towns from all available data (you might want to get this from a separate endpoint)
+  // For now, we'll use a static list or keep it empty since we don't have all data
+  const towns: string[] = []; // You might want to fetch this separately
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -103,11 +130,13 @@ const PropertiesSearchSection: React.FC = () => {
               placeholder="Search by address or town"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleManualSearch()}
               className="flex-1 border rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
-              onClick={() => {}}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg flex items-center justify-center"
+              onClick={handleManualSearch}
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg flex items-center justify-center disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
               <Search className="w-5 h-5 mr-1" />
               Search
@@ -116,6 +145,7 @@ const PropertiesSearchSection: React.FC = () => {
 
           {/* Filters */}
           <h2 className="font-semibold mb-3">Filters</h2>
+          
           <label className="text-sm font-medium">Town</label>
           <select
             className="w-full mt-1 mb-4 rounded-md border p-2 bg-background"
@@ -123,11 +153,33 @@ const PropertiesSearchSection: React.FC = () => {
             onChange={(e) => setQueryTown(e.target.value)}
           >
             <option value="">All towns</option>
-            {towns.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
+            {/* You might want to fetch towns from a separate endpoint */}
+            <option value="ANG MO KIO">ANG MO KIO</option>
+            <option value="BEDOK">BEDOK</option>
+            <option value="BISHAN">BISHAN</option>
+            <option value="BUKIT BATOK">BUKIT BATOK</option>
+            <option value="BUKIT MERAH">BUKIT MERAH</option>
+            <option value="BUKIT PANJANG">BUKIT PANJANG</option>
+            <option value="BUKIT TIMAH">BUKIT TIMAH</option>
+            <option value="CENTRAL AREA">CENTRAL AREA</option>
+            <option value="CHOA CHU KANG">CHOA CHU KANG</option>
+            <option value="CLEMENTI">CLEMENTI</option>
+            <option value="GEYLANG">GEYLANG</option>
+            <option value="HOUGANG">HOUGANG</option>
+            <option value="JURONG EAST">JURONG EAST</option>
+            <option value="JURONG WEST">JURONG WEST</option>
+            <option value="KALLANG/WHAMPOA">KALLANG/WHAMPOA</option>
+            <option value="MARINE PARADE">MARINE PARADE</option>
+            <option value="PASIR RIS">PASIR RIS</option>
+            <option value="PUNGGOL">PUNGGOL</option>
+            <option value="QUEENSTOWN">QUEENSTOWN</option>
+            <option value="SEMBAWANG">SEMBAWANG</option>
+            <option value="SENGKANG">SENGKANG</option>
+            <option value="SERANGOON">SERANGOON</option>
+            <option value="TAMPINES">TAMPINES</option>
+            <option value="TOA PAYOH">TOA PAYOH</option>
+            <option value="WOODLANDS">WOODLANDS</option>
+            <option value="YISHUN">YISHUN</option>
           </select>
 
           <label className="text-sm font-medium">Budget (≤ SGD)</label>
@@ -178,25 +230,27 @@ const PropertiesSearchSection: React.FC = () => {
           <div className="flex items-baseline justify-between mb-3">
             <h2 className="font-semibold text-lg">Search Results</h2>
             <div className="text-sm text-muted-foreground">
-              {loading ? "Loading…" : `${all.length} matches`}
+              {loading ? "Loading…" : `${totalResults.toLocaleString()} matches`}
               {error && <span className="ml-2 text-amber-600">{error}</span>}
             </div>
           </div>
 
           <div className="space-y-4">
-            {current.map((p) => (
+            {currentPageData.map((p) => (
               <PropertyCard
-                key={p.id}
+                key={`${p.id}-${page}`} // Include page in key to force re-render
                 property={p}
-                isInitiallyFavourite={p.isInitiallyFavourite} // pass prefilled prop
+                isInitiallyFavourite={p.isInitiallyFavourite}
               />
             ))}
-            {!loading && current.length === 0 && (
+            {!loading && currentPageData.length === 0 && (
               <div className="text-muted-foreground">No results. Try widening your filters.</div>
             )}
           </div>
 
-          <Pager page={page} pageCount={pageCount} onPageChange={setPage} />
+          {totalPages > 1 && (
+            <Pager page={page} pageCount={totalPages} onPageChange={handlePageChange} />
+          )}
         </section>
       </div>
     </div>

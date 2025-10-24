@@ -1,18 +1,32 @@
 import express from "express";
-import { registerUser, verifyEmail, loginUser} from "../controllers/userController.js";
+import { 
+  registerUser, 
+  verifyEmail, 
+  loginUser, 
+  changePassword, 
+  changeEmail, 
+  deleteAccount, 
+  forgotPassword, 
+  resetPassword 
+} from "../controllers/userController.js";
 import { authenticateToken } from "../middleware/auth.js";
-
 
 const router = express.Router();
 
-// Public route
+// Public routes
 router.post("/register", registerUser);
 router.get("/verify-email", verifyEmail);
-router.post("/login", loginUser)
+router.post("/login", loginUser);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
-//Protected route
+// Protected routes
 router.get("/profile", authenticateToken, (req, res) => {
   res.status(200).json({ message: "Welcome to your profile", user: req.user });
 });
+
+router.post("/change-password", authenticateToken, changePassword);
+router.post("/change-email", authenticateToken, changeEmail);
+router.delete("/delete-account", authenticateToken, deleteAccount);
 
 export default router;
