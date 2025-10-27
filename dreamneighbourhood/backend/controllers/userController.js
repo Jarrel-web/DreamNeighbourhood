@@ -272,3 +272,82 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const refreshToken = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const { data: user, error } = await pool
+      .from("users")
+      .select("id, username, email, is_verified")
+      .eq("id", userId)
+      .single();
+
+    if (error || !user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const newToken = jwt.sign(
+      { 
+        id: user.id, 
+        email: user.email, 
+        username: user.username, 
+        is_verified: user.is_verified 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+
+    res.status(200).json({
+      token: newToken,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        is_verified: user.is_verified
+      }
+    });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { data: user, error } = await pool
+      .from("users")
+      .select("email, username, verification_token, is_verified")
+      .eq("id", userId)
+      .single();
+
+    if (error || !user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.is_verified) {
+      return res.status(400).json({ message: "Email is already verified" });
+    }
+
+    let verificationToken = user.verification_token;
+    if (!verificationToken) {
+      const crypto = await import("crypto");
+      verificationToken = crypto.randomBytes(32).toString("hex");
+      
+      await pool
+        .from("users")
+        .update({ verification_token: verificationToken })
+        .eq("id", userId);
+    }
+
+    // Call your email sending function here
+    // await sendVerificationEmail(user.email, user.username, verificationToken);
+
+    res.status(200).json({ message: "Verification email sent successfully" });
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

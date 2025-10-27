@@ -7,7 +7,9 @@ import {
   changeEmail, 
   deleteAccount, 
   forgotPassword, 
-  resetPassword 
+  resetPassword,
+  refreshToken,
+  resendVerificationEmail
 } from "../controllers/userController.js";
 import { authenticateToken } from "../middleware/auth.js";
 
@@ -28,5 +30,6 @@ router.get("/profile", authenticateToken, (req, res) => {
 router.post("/change-password", authenticateToken, changePassword);
 router.post("/change-email", authenticateToken, changeEmail);
 router.delete("/delete-account", authenticateToken, deleteAccount);
-
+router.post("/refresh-token", authenticateToken, refreshToken);
+router.post("/send-verification-email", authenticateToken, resendVerificationEmail);
 export default router;

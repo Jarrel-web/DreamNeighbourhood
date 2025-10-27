@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 const WARNING_TIMEOUT = 10 * 60 * 1000; // show warning after 10minutes
-const SESSION_TIMEOUT = 30 * 1000; // auto logout after 30s
+const SESSION_TIMEOUT = 5 * 60 * 1000; // auto logout after 5 minutes
 
 export default function useSessionTimeout() {
   const { logoutUser, isLoggedIn } = useAuth();

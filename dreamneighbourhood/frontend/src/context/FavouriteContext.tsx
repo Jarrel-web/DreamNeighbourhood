@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getAllFavourites, addFavourite, removeFavourite, getFavouriteProperties } from "../services/favouriteServices";
+import { getFavouriteProperties, addFavourite, removeFavourite } from "../services/favouriteServices";
 import { useAuth } from "./AuthContext";
 import type { Property } from "../types/property";
 
 interface FavouritesContextType {
-  favourites: number[]; // Changed to array of property IDs
-  favouriteProperties: Property[]; // Added for full property objects
+  favourites: number[];
+  favouriteProperties: Property[];
   isFavourite: (propertyId: number) => boolean;
   toggleFavourite: (property: Property) => Promise<void>;
   loading: boolean;
@@ -20,49 +20,73 @@ const FavouritesContext = createContext<FavouritesContextType>({
 });
 
 export const FavouritesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { username, isLoggedIn } = useAuth();
-  const [favourites, setFavourites] = useState<number[]>([]); // Array of property IDs
-  const [favouriteProperties, setFavouriteProperties] = useState<Property[]>([]); // Full property objects
+  const { isLoggedIn, isVerified } = useAuth(); // Need both!
+  const [favourites, setFavourites] = useState<number[]>([]);
+  const [favouriteProperties, setFavouriteProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
+
+  console.log('🔍 FavouritesContext State:', {
+    isLoggedIn,
+    isVerified,
+    favouritesCount: favourites.length,
+    favouritePropertiesCount: favouriteProperties.length,
+    loading
+  });
 
   // Fetch favourited properties
   useEffect(() => {
+    console.log('🔄 FavouritesContext useEffect triggered:', {
+      isLoggedIn,
+      isVerified
+    });
+
     const fetchFavourites = async () => {
-      if (!username || !isLoggedIn) {
+      // User must be BOTH logged in AND verified to access favourites
+      if (!isLoggedIn || !isVerified) {
+        console.log('🚫 User not logged in or not verified - clearing favourites');
         setFavourites([]);
         setFavouriteProperties([]);
+        setLoading(false);
         return;
       }
+
       try {
+        console.log('📡 Fetching favourites for verified user');
         setLoading(true);
         
-        // Get favourite IDs
-        const favouriteData = await getAllFavourites();
-        const favouriteIds = favouriteData.map((fav) => fav.property_id);
+        const propertiesData = await getFavouriteProperties();
+        console.log('✅ Got favourite properties:', propertiesData);
+        
+        const favouriteIds = propertiesData.map((property: Property) => property.id);
+        console.log('📋 Extracted Favourite IDs:', favouriteIds);
+        
         setFavourites(favouriteIds);
-
-        // Get full property details if we have favourites
-        if (favouriteIds.length > 0) {
-          const propertiesData = await getFavouriteProperties();
-          setFavouriteProperties(propertiesData);
-        } else {
-          setFavouriteProperties([]);
-        }
+        setFavouriteProperties(propertiesData);
+        
       } catch (err) {
-        console.error("Failed to fetch favourites:", err);
+        console.error('❌ Failed to fetch favourites:', err);
         setFavourites([]);
         setFavouriteProperties([]);
       } finally {
+        console.log('🏁 Favourites fetch completed');
         setLoading(false);
       }
     };
 
     fetchFavourites();
-  }, [username, isLoggedIn]);
+  }, [isLoggedIn, isVerified]); // Depend on both!
 
-  const isFavourite = (propertyId: number) => favourites.includes(propertyId);
+  const isFavourite = (propertyId: number) => {
+    return favourites.includes(propertyId);
+  };
 
   const toggleFavourite = async (property: Property) => {
+    // Extra safety check - user must be verified to toggle favourites
+    if (!isLoggedIn || !isVerified) {
+      console.log('❌ Cannot toggle favourite - user not verified');
+      return;
+    }
+
     try {
       if (isFavourite(property.id)) {
         await removeFavourite(property.id);
@@ -74,7 +98,7 @@ export const FavouritesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setFavouriteProperties((prev) => [...prev, property]);
       }
     } catch (err) {
-      console.error("Failed to toggle favourite:", err);
+      console.error('❌ Failed to toggle favourite:', err);
     }
   };
 
