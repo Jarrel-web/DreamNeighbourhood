@@ -80,10 +80,21 @@ const PropertiesSearchSection: React.FC = () => {
     }
   };
 
-  // Load initial page
+  // Load initial page - only depend on isLoggedIn to prevent excessive re-fetches
   React.useEffect(() => {
     fetchPageData(1, true);
-  }, [isLoggedIn, favourites]);
+  }, [isLoggedIn]);
+
+  // Update favourite status when favourites change
+  React.useEffect(() => {
+    if (isLoggedIn && currentPageData.length > 0) {
+      const updatedData = currentPageData.map((p) => ({
+        ...p,
+        isInitiallyFavourite: isFavourite(p.id),
+      }));
+      setCurrentPageData(updatedData);
+    }
+  }, [favourites, isLoggedIn]);
 
   // Handle page changes
   const handlePageChange = (newPage: number) => {
@@ -112,8 +123,6 @@ const PropertiesSearchSection: React.FC = () => {
     setPage(1);
     fetchPageData(1, true); // Scroll for manual searches
   };
-
-  
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -151,7 +160,6 @@ const PropertiesSearchSection: React.FC = () => {
             onChange={(e) => setQueryTown(e.target.value)}
           >
             <option value="">All towns</option>
-            {/* You might want to fetch towns from a separate endpoint */}
             <option value="ANG MO KIO">ANG MO KIO</option>
             <option value="BEDOK">BEDOK</option>
             <option value="BISHAN">BISHAN</option>
@@ -236,7 +244,7 @@ const PropertiesSearchSection: React.FC = () => {
           <div className="space-y-4">
             {currentPageData.map((p) => (
               <PropertyCard
-                key={`${p.id}-${page}`} // Include page in key to force re-render
+                key={`${p.id}-${page}`}
                 property={p}
                 isInitiallyFavourite={p.isInitiallyFavourite}
               />

@@ -1,11 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { getToken, saveToken, clearToken } from "../services/tokenService";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  id: string;
+  email: string;
+  username: string; // This might not exist in your token
+  is_verified: boolean;
+  exp: number;
+}
 
 type AuthContextType = {
   isLoggedIn: boolean;
   username: string | null;
-  loginUser: (token: string, username: string) => void;
+  email: string | null; // Add email field
+  isVerified: boolean;
+  userId: string | null;
+  loginUser: (token: string) => void; // Remove username parameter
   logoutUser: () => void;
   loading: boolean;
 };
@@ -17,35 +29,83 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null); // Add email state
+  const [isVerified, setIsVerified] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const token = getToken();
-    if (token) {
+  const decodeAndSetAuth = (token: string) => {
+    try {
+      console.log('🔓 Decoding token...');
+      const decoded = jwtDecode<DecodedToken>(token);
+      console.log('✅ Token decoded:', decoded);
+      
       setIsLoggedIn(true);
-      const storedUsername = localStorage.getItem("username");
-      if (storedUsername) setUsername(storedUsername);
+      // Use email as username if username doesn't exist in token
+      setUsername(decoded.username || decoded.email); // FIX: Fallback to email
+      setEmail(decoded.email); // Store email separately
+      setIsVerified(decoded.is_verified);
+      setUserId(decoded.id);
+      
+      console.log('✅ Auth state updated:', {
+        username: decoded.username || decoded.email, // FIX: Fallback to email
+        email: decoded.email,
+        isVerified: decoded.is_verified,
+        userId: decoded.id
+      });
+    } catch (error) {
+      console.error('❌ Error decoding token:', error);
+      clearToken();
+      setIsLoggedIn(false);
+      setUsername(null);
+      setEmail(null);
+      setIsVerified(false);
+      setUserId(null);
+    }
+  };
+
+  useEffect(() => {
+    console.log('🔄 AuthContext initializing...');
+    const token = getToken();
+    console.log('📋 Token found:', !!token);
+    
+    if (token) {
+      decodeAndSetAuth(token);
+    } else {
+      console.log('🚫 No token found');
     }
     setLoading(false);
   }, []);
 
-  const loginUser = (token: string, username: string) => {
+  const loginUser = (token: string) => { // Remove username parameter
+    console.log('🔑 loginUser called:', { token: !!token });
     saveToken(token);
-    if (username) localStorage.setItem("username", username);
-    setUsername(username);
-    setIsLoggedIn(true);
+    decodeAndSetAuth(token);
   };
 
   const logoutUser = () => {
+    console.log('🚪 logoutUser called');
     clearToken();
-    localStorage.removeItem("username");
     setUsername(null);
+    setEmail(null);
+    setIsVerified(false);
+    setUserId(null);
     setIsLoggedIn(false);
+    console.log('✅ User logged out');
   };
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, username, loginUser, logoutUser, loading }}
+      value={{ 
+        isLoggedIn, 
+        username, 
+        email, // Provide email
+        isVerified,
+        userId,
+        loginUser, 
+        logoutUser, 
+        loading 
+      }}
     >
       {children}
     </AuthContext.Provider>

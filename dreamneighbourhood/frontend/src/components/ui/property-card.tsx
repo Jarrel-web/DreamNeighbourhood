@@ -12,15 +12,54 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavourite = false }) => {
-  const { username } = useAuth();
+  const { isLoggedIn, isVerified, username } = useAuth();
   const { isFavourite, toggleFavourite } = useFavourites();
 
+  console.log('🔍 PropertyCard Render:', {
+    propertyId: property.id,
+    isLoggedIn,
+    isVerified,
+    username,
+    isInitiallyFavourite,
+    isFavouriteResult: isFavourite(property.id)
+  });
+
   const favouriteStatus = isInitiallyFavourite || isFavourite(property.id);
+  const canToggleFavourite = isLoggedIn && isVerified;
+
+  console.log('💖 PropertyCard Favourite State:', {
+    propertyId: property.id,
+    favouriteStatus,
+    canToggleFavourite
+  });
 
   const handleFavouriteClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (!username) return;
-    await toggleFavourite(property);
+    console.log('🖱️ Favourite Button Clicked:', {
+      propertyId: property.id,
+      canToggleFavourite,
+      isLoggedIn,
+      isVerified
+    });
+    
+    if (!canToggleFavourite) {
+      console.log('❌ Favourite toggle blocked - user not verified or not logged in');
+      return;
+    }
+    
+    try {
+      console.log('✅ Toggling favourite for property:', property.id);
+      await toggleFavourite(property);
+      console.log('✅ Favourite toggle completed for property:', property.id);
+    } catch (error) {
+      console.error('❌ Favourite toggle failed:', error);
+    }
+  };
+
+  const getTooltipText = () => {
+    if (!isLoggedIn) return "Please log in to add favourites";
+    if (!isVerified) return "Please verify your account to add favourites";
+    return favouriteStatus ? "Remove from favourites" : "Add to favourites";
   };
 
   return (
@@ -28,22 +67,30 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavour
       to={`/property/${property.id}`}
       className="relative rounded-xl border bg-card shadow-sm overflow-hidden flex flex-col md:flex-row gap-4 w-full max-w-full hover:shadow-md transition-shadow"
     >
-      {/* Heart button on top-right of the card */}
-      {username && (
-        <button
-          onClick={handleFavouriteClick}
-          className="absolute top-2 right-2 p-2 rounded-full bg-white shadow hover:scale-110 transition-transform z-10"
-        >
-          <Heart
-            className={`w-6 h-6 transition-colors duration-200 ${
-              favouriteStatus ? "text-red-500" : "text-gray-400"
-            }`}
-            fill={favouriteStatus ? "currentColor" : "none"}
-          />
-        </button>
-      )}
+      {/* Heart button - ALWAYS VISIBLE */}
+      <button
+        onClick={handleFavouriteClick}
+        disabled={!canToggleFavourite}
+        className={`absolute top-2 right-2 p-2 rounded-full shadow transition-transform z-10 ${
+          canToggleFavourite 
+            ? "bg-white hover:bg-gray-50 cursor-pointer hover:scale-110" 
+            : "bg-gray-100 cursor-not-allowed"
+        }`}
+        title={getTooltipText()}
+      >
+        <Heart
+          className={`w-6 h-6 transition-colors duration-200 ${
+            favouriteStatus 
+              ? "text-red-500" 
+              : canToggleFavourite 
+                ? "text-gray-400 hover:text-gray-600" 
+                : "text-gray-300"
+          }`}
+          fill={favouriteStatus ? "currentColor" : "none"}
+        />
+      </button>
 
-      {/* Image */}
+      {/* Rest of your component */}
       <div className="w-full md:w-48 flex-shrink-0">
         <img
           src={stockImg}
@@ -52,7 +99,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavour
         />
       </div>
 
-      {/* Details */}
       <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
         <div>
           <h3 className="font-semibold text-base sm:text-lg line-clamp-2">

@@ -13,8 +13,17 @@ export type UserProfileResponse = {
     created_at: string;
   };
 };
+export type RefreshTokenResponse = {
+  token: string;
+  user: {
+    id: string;
+    username: string;
+    email: string;
+    is_verified: boolean;
+  };
+};
+export type SendVerificationEmailResponse = { message: string };
 
-// User management functions (require authentication)
 export async function changePassword(currentPassword: string, newPassword: string): Promise<ChangePasswordResponse> {
   return apiRequest<ChangePasswordResponse>("/users/change-password", {
     method: "POST",
@@ -44,7 +53,20 @@ export async function getUserProfile(): Promise<UserProfileResponse> {
   });
 }
 
-// Future user management functions can go here
+export async function refreshToken(): Promise<RefreshTokenResponse> {
+  return apiRequest<RefreshTokenResponse>("/users/refresh-token", {
+    method: "POST",
+    headers: { ...authHeader() },
+  });
+}
+
+export async function sendVerificationEmail(): Promise<SendVerificationEmailResponse> {
+  return apiRequest<SendVerificationEmailResponse>("/users/send-verification-email", {
+    method: "POST",
+    headers: { ...authHeader() },
+  });
+}
+
 export async function updateProfile(username: string): Promise<{ message: string }> {
   return apiRequest<{ message: string }>("/users/profile", {
     method: "PUT",
