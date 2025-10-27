@@ -146,4 +146,4 @@ export const priceFilter = async (req, res) => {
   } catch (error) {
     console.error("Error handling price filter:", error.message);
   }
-}
+}*/

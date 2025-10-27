@@ -1,41 +1,39 @@
+// scripts/importResaleCSV.js
 import fs from "fs";
 import csvParser from "csv-parser";
-import { pool } from "../config/db.js"; // your existing Supabase connection
+import { pool } from "../config/db.js"; // Supabase client
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const INPUT_CSV = "./data/resale_flats_with_geocode.csv";
 
+// Insert or upsert a single row
 const insertRow = async (row) => {
-  const query = `
-    INSERT INTO properties (
-      town, flat_type, flat_model, floor_area, lease_commence_date,
-      remaining_lease, street_name, block, storey_range, resale_price,
-      latitude, longitude, postal_code,address
-    )
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
-  `;
-
-  const values = [
-    row.town,
-    row.flat_type,
-    row.flat_model,
-    row.floor_area_sqm,
-    row.lease_commence_date,
-    row.remaining_lease,
-    row.street_name,
-    row.block,
-    row.storey_range,
-    row.resale_price,
-    row.latitude || null,
-    row.longitude || null,
-    row.postal_code || null,
-    `${row.block} ${row.street_name}, Singapore`
-    
-  ];
-
   try {
-    await pool.query(query, values);
+    await pool.from("properties").upsert(
+      [
+        {
+          town: row.town,
+          flat_type: row.flat_type,
+          flat_model: row.flat_model,
+          floor_area: row.floor_area_sqm,
+          lease_commence_date: row.lease_commence_date,
+          remaining_lease: row.remaining_lease,
+          street_name: row.street_name,
+          block: row.block,
+          storey_range: row.storey_range,
+          resale_price: row.resale_price,
+          latitude: row.latitude || null,
+          longitude: row.longitude || null,
+          postal_code: row.postal_code || null,
+          address: `${row.block} ${row.street_name}, Singapore`,
+        },
+      ],
+      { onConflict: ["id"] } // use primary key 'id' to avoid duplicates
+    );
   } catch (error) {
-    console.error("❌ Insert error for row:", row, error.message);
+    console.error("❌ Insert/Upsert error for row:", row, error.message);
   }
 };
 
@@ -51,11 +49,11 @@ const main = async () => {
 
       for (let i = 0; i < rows.length; i++) {
         await insertRow(rows[i]);
-        if (i % 100 === 0) console.log(`✅ Inserted ${i}/${rows.length}`);
+        if (i % 100 === 0) console.log(`✅ Processed ${i}/${rows.length}`);
       }
 
       console.log("🎉 All data inserted successfully!");
-      pool.end();
+      // Supabase client does not need pool.end()
     });
 };
 
