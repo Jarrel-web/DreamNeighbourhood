@@ -9,14 +9,20 @@ export type PropertiesResponse = {
   totalPages?: number;
 };
 
+export type RankedAmenity = {
+  type: string;
+  rank: number;
+};
+
 export type SearchParams = {
   searchText?: string;
   town?: string;
   maxPrice?: number;
   minRooms?: number;
   minArea?: number;
-  page?: number;
-  pageSize?: number;
+  amenitiesRanking?: RankedAmenity[]; // Add this line
+  page: number;
+  pageSize: number;
 };
 
 // Get default properties with pagination
