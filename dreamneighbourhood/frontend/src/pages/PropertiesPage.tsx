@@ -1,14 +1,45 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getPropertyById } from "@/services/propertiesService";
 import type { Property } from "@/types/property";
+import { ArrowLeft } from "lucide-react";
 
 const PropertyDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [iframeKey, setIframeKey] = useState(0);
+
+  // Smart back function that works in all scenarios
+ // Smart back function that works in all scenarios
+  const handleBack = () => {
+    // Get the current search parameters from the URL
+    const currentSearchParams = new URLSearchParams(window.location.search);
+    
+    // Check if we have history to go back to
+    if (window.history.length > 1) {
+      // We have previous pages in history, go back
+      navigate(-1);
+    } else {
+      // No history (first page load), go to home page (search) with preserved params
+      navigate(`/?${currentSearchParams.toString()}`);
+    }
+  };
+
+  // Handle Escape key
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleBack();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -54,6 +85,17 @@ const PropertyDetailsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
+      {/* Enhanced Back Button */}
+      <div className="container mx-auto px-4 mb-6">
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-300 text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md active:scale-95 group"
+        >
+          <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+          <span className="font-medium text-lg">Back</span>
+        </button>
+      </div>
+
       <div className="flex items-center justify-center p-4">
         <div className="w-full max-w-7xl mx-auto">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-12 items-stretch">

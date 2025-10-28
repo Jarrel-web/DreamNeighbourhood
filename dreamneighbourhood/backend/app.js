@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import userRoutes from "./routes/userRoutes.js";
 import favouriteRoutes from "./routes/favouriteRoutes.js";
 import propertiesRoutes from "./routes/propertiesRoutes.js";
-//import openMapRoutes from "./routes/openMapRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
 
 dotenv.config();
 
@@ -23,7 +23,7 @@ app.use(cors({
 // Routes
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/favourites", favouriteRoutes);
-//app.use("/api/v1/search", openMapRoutes);
+app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1/properties", propertiesRoutes);
 // Start server
 const PORT = process.env.PORT || 5000;

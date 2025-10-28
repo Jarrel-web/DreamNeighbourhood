@@ -7,7 +7,6 @@ export const routes = {
   resetPassword: "/resetPassword", 
   propertyDetails: "/property/:id",
   properties: "/properties",
-  propertiesSearch: "/properties/search",
   favourites: "/favourites",
   account: "/account",
   error: "*",

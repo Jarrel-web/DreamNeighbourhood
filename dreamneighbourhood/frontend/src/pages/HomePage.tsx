@@ -1,6 +1,6 @@
 import bannerImg from "../assets/images/Banner.png";
 import { MapPin, Search, Home } from "lucide-react";
-import PropertiesSearchSection from "../components/PropertiesSearchSection";
+import PropertiesSearchSection from "../components/PropertiesSearchSection/PropertiesSearchSection";
 function HomePage() {
   return (
     <div>

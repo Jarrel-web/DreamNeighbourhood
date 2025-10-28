@@ -1,9 +1,11 @@
+// main.tsx
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { routerConfig } from "./routes";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
-import { FavouritesProvider } from "./context/FavouriteContext"; // ✅ import this
+import { FavouritesProvider } from "./context/FavouriteContext";
+import { SearchProvider } from "./context/SearchContext"; // ✅ Add this import
 import "./index.css";
 import useSessionTimeout from "./hooks/useSessionTimeout";
 
@@ -23,7 +25,9 @@ const root = createRoot(document.getElementById("root")!);
 root.render(
   <AuthProvider>
     <FavouritesProvider>
-      <Root />
+      <SearchProvider> {/* ✅ Add SearchProvider here */}
+        <Root />
+      </SearchProvider>
     </FavouritesProvider>
   </AuthProvider>
 );
