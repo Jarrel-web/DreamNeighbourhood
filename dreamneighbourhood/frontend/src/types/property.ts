@@ -1,27 +1,37 @@
-export type Property = {
-  address: string;
+// types/property.ts
+export interface ScoredAmenity {
+  name: string;
+  type: string;
+  distance: number;
+  lat: number;
+  lon: number;
+  formattedAddress?: string;
+  website?: string | null;
+  opening_hours?: any;
+}
+
+export interface AmenityScore {
+  distance: number;
+  score: number;
+  amenities: ScoredAmenity[];
+}
+
+export interface Property {
   id: number;
-  month: string;
-  town: string;
-  flat_type: string;
   block: string;
   street_name: string;
-  storey_range: string;
+  town: string;
+  flat_type: string;
   floor_area_sqm: number;
+  storey_range: string;
   flat_model: string;
-  lease_commence_date?: number;
   remaining_lease: string;
-  resale_price: number;
   postal_code: string;
-  latitude?: number;
-  longitude?: number;
-  isInitiallyFavourite?: boolean;
-  address_line: string;
+  resale_price: number;
+  latitude: number;
+  longitude: number;
   description?: string;
-
-   totalScore?: number;
-  amenityScores?: Record<string, {
-    distance: number;
-    score: number;
-  }>; 
-};
+  // optional for ranked properties
+  totalScore?: number;
+  amenityScores?: Record<string, AmenityScore>;
+}

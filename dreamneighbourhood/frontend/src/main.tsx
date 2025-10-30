@@ -7,6 +7,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { FavouritesProvider } from "./context/FavouriteContext";
 import { SearchProvider } from "./context/SearchContext"; // ✅ Add this import
 import "./index.css";
+import "leaflet/dist/leaflet.css";
 import useSessionTimeout from "./hooks/useSessionTimeout";
 
 function Root() {

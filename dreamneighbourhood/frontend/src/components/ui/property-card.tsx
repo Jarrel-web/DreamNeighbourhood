@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { Property } from "../../types/property";
+import type { Amenity } from "../../types/amenity";
 import stockImg from "../../assets/images/stock-photo.png";
 import { Heart } from "lucide-react";
 import { useFavourites } from "../../context/FavouriteContext";
@@ -9,6 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 interface PropertyCardProps {
   property: Property;
   isInitiallyFavourite?: boolean;
+  amenities?: Amenity[]; // Pass closest amenities if from ranked search
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavourite = false }) => {
@@ -20,15 +22,26 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavour
   const favouriteStatus = isInitiallyFavourite || isFavourite(property.id);
   const canToggleFavourite = isLoggedIn && isVerified;
 
- const handleCardClick = () => {
-    // Replace the current history entry when navigating to property details
-    // This prevents creating multiple property entries in history
-    navigate(`/property/${property.id}?${searchParams.toString()}`);
+  const handleCardClick = () => {
+    const amenitiesToPass = property.amenityScores
+    ? Object.values(property.amenityScores)
+        .map((score: any) => score?.amenity) // Changed from a.amenities to score.amenity
+        .filter(Boolean)
+    : [];
+
+  console.log("Navigating with amenities:", amenitiesToPass);
+  
+  navigate(`/property/${property.id}?${searchParams.toString()}`, {
+    state: { 
+      property: property, // Pass the entire scored property
+      amenities: amenitiesToPass 
+    },
+  });
   };
 
   const handleFavouriteClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevent card click when clicking favourite
+    e.stopPropagation();
     if (!canToggleFavourite) return;
     try {
       await toggleFavourite(property);
@@ -48,7 +61,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavour
       onClick={handleCardClick}
       className="relative rounded-xl border bg-card shadow-sm overflow-hidden flex flex-col md:flex-row gap-4 w-full max-w-full hover:shadow-md transition-shadow cursor-pointer"
     >
-      {/* Heart button */}
       <button
         onClick={handleFavouriteClick}
         disabled={!canToggleFavourite}
@@ -65,13 +77,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavour
         />
       </button>
 
-      
-      {/* Image */}
       <div className="w-full md:w-48 flex-shrink-0">
         <img src={stockImg} alt="Property" className="w-full h-auto md:h-full object-cover rounded-lg" />
       </div>
 
-      {/* Info */}
       <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
         <div>
           <h3 className="font-semibold text-base sm:text-lg line-clamp-2">

@@ -28,10 +28,10 @@ export const fetchAmenitiesAroundProperty = async (amenityType, lat, lng, radius
   try {
     const res = await axios.get(url);
 
-
+    
     return res.data.features.map((f) => ({
-      lat: f.geometry.coordinates[1],
-      lng: f.geometry.coordinates[0],
+      lat: f.properties.lat,
+      lng: f.properties.lon,
       distance: f.properties.distance, // distance from the point
       name: f.properties.name,
       address: f.properties.address_line1,

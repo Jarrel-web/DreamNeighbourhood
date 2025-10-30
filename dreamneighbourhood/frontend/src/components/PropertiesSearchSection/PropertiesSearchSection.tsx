@@ -111,7 +111,6 @@ const PropertiesSearchSection: React.FC = () => {
     // Apply frontend filters
     if (searchText) {
       filtered = filtered.filter(p =>
-        p.address?.toLowerCase().includes(searchText.toLowerCase()) ||
         p.street_name?.toLowerCase().includes(searchText.toLowerCase()) ||
         p.town?.toLowerCase().includes(searchText.toLowerCase())
       );
