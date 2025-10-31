@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 import request from 'supertest';
 import app from '../app.js';
-import { makeOneMapRequest } from '../utils/oneMapRequest.js';
 
 
 // Mock the makeOneMapRequest function
@@ -17,7 +16,7 @@ describe('Search API', () => {
   describe('GET /api/search', () => {
     it('should return 400 if no query parameter is provided', async () => {
       const response = await request(app)
-        .get('/api/v1/search')
+        .post('/api/v1/search/rank-properties')
         .expect('Content-Type', /json/)
         .expect(400);
 
