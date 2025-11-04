@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
     setSubmitting(true);
     try {
       const res = await login(email, password);
-      loginUser(res.token, res.user.username);
+      loginUser(res.token);
       navigate("/");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";

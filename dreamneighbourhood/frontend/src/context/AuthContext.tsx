@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 interface DecodedToken {
   id: string;
   email: string;
-  username: string; // This might not exist in your token
+  username: string; 
   is_verified: boolean;
   exp: number;
 }
@@ -41,14 +41,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       console.log('✅ Token decoded:', decoded);
       
       setIsLoggedIn(true);
-      // Use email as username if username doesn't exist in token
-      setUsername(decoded.username || decoded.email); // FIX: Fallback to email
-      setEmail(decoded.email); // Store email separately
+     
+      setUsername(decoded.username || decoded.email); 
+      setEmail(decoded.email); 
       setIsVerified(decoded.is_verified);
       setUserId(decoded.id);
       
       console.log('✅ Auth state updated:', {
-        username: decoded.username || decoded.email, // FIX: Fallback to email
+        username: decoded.username || decoded.email, 
         email: decoded.email,
         isVerified: decoded.is_verified,
         userId: decoded.id
@@ -77,9 +77,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setLoading(false);
   }, []);
 
-  const loginUser = (token: string) => { // Remove username parameter
+  const loginUser = (token: string) => {
     console.log('🔑 loginUser called:', { token: !!token });
     saveToken(token);
+    console.log('✅ Token saved to localStorage:', token);
     decodeAndSetAuth(token);
   };
 

@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "test:qunit": "qunit tests/backend.qunit.js",
     "dev": "nodemon app.js",
     "populate": "node scripts/populatePropertyTable.js"
@@ -35,5 +37,26 @@
     "nodemon": "^3.1.10",
     "qunit": "^2.24.2",
     "supertest": "^7.1.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleFileExtensions": ["js", "json", "jsx", "ts", "tsx", "json"],
+    "collectCoverageFrom": [
+      "controllers/**/*.js",
+      "routes/**/*.js",
+      "middleware/**/*.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
   }
 }

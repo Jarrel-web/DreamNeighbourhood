@@ -1,6 +1,7 @@
-const TOKEN_KEY = "dn_jwt";
+const TOKEN_KEY = "token";
 
 export function saveToken(token: string): void {
+  console.log('💾 saveToken() called with:', token.substring(0, 20) + '...');
   localStorage.setItem(TOKEN_KEY, token);
 }
 
@@ -12,7 +13,14 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
-export function authHeader(): HeadersInit {
+export function authHeader(): Record<string, string> {
   const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  console.log('🛡️ authHeader() called, token exists:', !!token);
+  
+  if (token) {
+    return { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` };
+  }
+  return {};
 }

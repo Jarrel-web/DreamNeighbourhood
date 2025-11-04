@@ -33,6 +33,8 @@ export async function changePassword(currentPassword: string, newPassword: strin
 }
 
 export async function changeEmail(newEmail: string): Promise<ChangeEmailResponse> {
+  
+
   return apiRequest<ChangeEmailResponse>("/users/change-email", {
     method: "POST",
     headers: { ...authHeader() },

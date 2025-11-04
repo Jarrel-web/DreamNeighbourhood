@@ -50,7 +50,7 @@ export const sendVerificationEmail = async (toEmail,username, verificationToken)
 
 export const sendResetPasswordEmail = async (toEmail, username, resetToken) => {
   try {
-    const url = `${process.env.FRONTEND_URL}/resetPassword?token=${resetToken}`;
+    const url = `${process.env.BASE_URL}/resetPassword?token=${resetToken}`;
     await transporter.sendMail({
       from: `"DreamNeighbourhood" <${process.env.EMAIL_USER}>`,
       to: toEmail,
