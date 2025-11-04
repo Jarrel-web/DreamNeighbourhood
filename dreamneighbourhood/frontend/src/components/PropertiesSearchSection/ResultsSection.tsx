@@ -136,7 +136,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
       <div className="space-y-6">
         {currentPageData.map((property, index) => (
           <EnhancedPropertyCard
-            key={`${property.id}-${property.isInitiallyFavourite}`}
+            key={`${property.id}-${index}`}
             property={property}
             rank={index + 1 + (page - 1) * PAGE_SIZE}
             rankedAmenitiesLength={rankedAmenities.length}

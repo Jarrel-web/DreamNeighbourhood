@@ -9,19 +9,18 @@ import { useAuth } from "../../context/AuthContext";
 
 interface PropertyCardProps {
   property: Property;
-  isInitiallyFavourite?: boolean;
-  amenities?: Amenity[]; // Pass closest amenities if from ranked search
+  amenities?: Amenity[]; 
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavourite = false }) => {
+const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const { isLoggedIn, isVerified } = useAuth();
   const { isFavourite, toggleFavourite } = useFavourites();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const favouriteStatus = isInitiallyFavourite || isFavourite(property.id);
+  const favouriteStatus =  isFavourite(property.id);
   const canToggleFavourite = isLoggedIn && isVerified;
-
+  
   const handleCardClick = () => {
     const amenitiesToPass = property.amenityScores
     ? Object.values(property.amenityScores)
@@ -29,7 +28,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavour
         .filter(Boolean)
     : [];
 
-  console.log("Navigating with amenities:", amenitiesToPass);
+  
   
   navigate(`/property/${property.id}?${searchParams.toString()}`, {
     state: { 
@@ -87,7 +86,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, isInitiallyFavour
             Blk {property.block} {property.street_name}, {property.town}
           </h3>
           <div className="mt-1 text-sm text-muted-foreground">
-            {property.flat_type} • {property.floor_area_sqm} sqm • {property.storey_range} Floor
+            {property.flat_type} • {property.floor_area} sqm • {property.storey_range} Floor
           </div>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <span>Model: {property.flat_model}</span>

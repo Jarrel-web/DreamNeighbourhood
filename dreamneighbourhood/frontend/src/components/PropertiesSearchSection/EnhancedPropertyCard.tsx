@@ -27,7 +27,7 @@ const EnhancedPropertyCard: React.FC<EnhancedPropertyCardProps> = ({
       <div className="p-6">
         <PropertyCard
           property={property}
-          isInitiallyFavourite={property.isInitiallyFavourite}
+          
         />
         
         {/* Score Indicator - Only show when we have ranked amenities */}

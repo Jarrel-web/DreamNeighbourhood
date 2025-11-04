@@ -21,7 +21,7 @@ import { PAGE_SIZE, AMENITY_TYPES } from "./constants";
 const PropertiesSearchSection: React.FC = () => {
   // Hooks
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  
   const { searchState, setSearchState } = useSearch();
   const { favourites, isFavourite } = useFavourites();
   const { isLoggedIn } = useAuth();
@@ -35,7 +35,7 @@ const PropertiesSearchSection: React.FC = () => {
 
   // Extract state from context
   const {
-    properties: allProperties,
+    
     currentBackendResults,
     searchText,
     selectedTown,
@@ -125,7 +125,7 @@ const PropertiesSearchSection: React.FC = () => {
       });
     }
     if (minArea !== null) {
-      filtered = filtered.filter(p => p.floor_area_sqm >= minArea);
+      filtered = filtered.filter(p => p.floor_area >= minArea);
     }
 
     // Calculate pagination
@@ -209,7 +209,7 @@ const PropertiesSearchSection: React.FC = () => {
       
       const data: PropertiesResponse = await getDefaultProperties();
       const properties = data.results || [];
-      
+      console.log("Fetched default properties:", properties);
       setInitialProperties(properties);
       
       if (!hasSearched) {
@@ -249,7 +249,6 @@ const PropertiesSearchSection: React.FC = () => {
 
       const data: PropertiesResponse = await searchProperties(searchParams);
       const properties = data.results || [];
-
       setAllProperties(properties);
       setCurrentBackendResults(properties);
       updateState({ 

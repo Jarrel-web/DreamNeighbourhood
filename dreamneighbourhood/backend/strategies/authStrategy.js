@@ -12,11 +12,32 @@ export class EmailPasswordStrategy extends AuthStrategy {
   }
 
   async authenticate({ email, password }) {
-    const user = await this.userRepository.findByEmail(email);
-    if (!user) return null;
+    
+      
+      const user = await this.userRepository.findByEmail(email);
+      
+      
+      if (!user) {
+       
+        return null;
+      }
 
-    const isMatch = await this.bcrypt.compare(password, user.password);
-    if (!isMatch) return null;
+      // Check if user has password (in case of social logins etc.)
+      if (!user.password) {
+        
+        return null;
+      }
+
+      
+      const isMatch = await this.bcrypt.compare(password, user.password);
+    
+      
+      if (!isMatch) {
+        
+        return null;
+      }
+
+     
 
     return user;
   }

@@ -22,7 +22,7 @@ export interface Property {
   street_name: string;
   town: string;
   flat_type: string;
-  floor_area_sqm: number;
+  floor_area: number;
   storey_range: string;
   flat_model: string;
   remaining_lease: string;
