@@ -210,6 +210,23 @@ All endpoints are prefixed with `/api/v1`. Protected routes require authenticati
 | POST | `/api/v1/search/rank-properties` | Rank properties based on user's amenities | `{ "amenities": [{ "amenityTheme": "...", "rank": 1, "maxDistance": 1000 }] }` |
 
 > ⚡ Tip: All POST requests require JSON bodies. Authentication is required for routes marked as Protected.
+> 
+## Postman Collection
+
+You can import the Postman collection `API.postman_collection.json` into Postman:
+
+**Import Steps:**
+
+1. Open Postman → Click `Import` → `File` → Select `postman_collection.json`.
+2. Set the environment variables: `BASE_URL`, `TOKEN`, `TOWN`, `RESET_TOKEN`.
+3. Use the APIs interactively.
+
+**Collection structure:**
+
+- **User APIs**: Register, login, profile, change password/email, delete account, forgot/reset password, refresh token, resend verification email.
+- **Favourites APIs**: View, add, remove favourite properties.
+- **Properties APIs**: Fetch all properties or fetch by ID.
+- **Search APIs**: Rank properties based on amenities using a `town` query.
 
 <h2 id="system-architecture">🏗 System Architecture</h2>
 
