@@ -95,7 +95,10 @@ describe('Scoring Utils', () => {
     
     expect(result.totalScore).toBeGreaterThanOrEqual(0);
     expect(result.totalScore).toBeLessThanOrEqual(1);
+    console.log("total score:", result.totalScore);
     expect(result.amenityScores.school.score).toBeGreaterThan(0);
+    console.log("score for school amenity:", result.amenityScores.school.score);
+    
   });
 
   test('Property with no nearby amenities', async () => {
@@ -111,6 +114,8 @@ describe('Scoring Utils', () => {
     
     expect(result.totalScore).toBe(0);
     expect(result.amenityScores.school.score).toBe(0);
+    console.log("score with no amenities:", result.totalScore);
+
   });
 
   test('Multiple amenities with different ranks', async () => {
@@ -134,6 +139,7 @@ describe('Scoring Utils', () => {
     expect(result.amenityScores.school.score).toBeGreaterThan(0);
     expect(result.amenityScores.supermarket.score).toBeGreaterThanOrEqual(0);
     expect(result.amenityScores.hospital.score).toBe(0);
+    console.log("amenity scores:", result.amenityScores);
   });
 
   test('Distance affects score', async () => {
@@ -172,6 +178,7 @@ describe('Scoring Utils', () => {
     expect(nearResult.totalScore).toBeGreaterThan(0);
     expect(farResult.totalScore).toBeGreaterThan(0);
     expect(nearResult.totalScore).toBeGreaterThan(farResult.totalScore);
+    console.log("near result:", nearResult.totalScore, "far result:", farResult.totalScore);
   });
 });
 
