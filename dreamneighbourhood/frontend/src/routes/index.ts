@@ -11,7 +11,8 @@ import ErrorPage from "@/pages/ErrorPage";
 import ProfilePage from "@/pages/ProfilePage";
 import SignUpPage from "@/pages/SignUpPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
-import ResetPasswordPage from "@/pages/ResetPasswordPage"; // Import the new component
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import VerifyEmailPage from "@/pages/VerifyEmailPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 export const routerConfig = createBrowserRouter([
@@ -22,7 +23,7 @@ export const routerConfig = createBrowserRouter([
       { path: routes.home, Component: HomePage },
       { path: routes.loginIn, Component: LoginPage },
       { path: routes.propertyDetails, Component: PropertiesPage },
-      
+      { path: routes.verifyEmail, Component: VerifyEmailPage },
       {
         path: routes.favourites,
         Component: () =>

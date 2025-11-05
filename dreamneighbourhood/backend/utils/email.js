@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendVerificationEmail = async (toEmail,username, verificationToken) => {
   try {
-    const url = `${process.env.BASE_URL}/api/v1/users/verify-email?token=${verificationToken}`;
+    const url = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
     await transporter.sendMail({
       from: `"DreamNeighbourhood" <${process.env.EMAIL_USER}>`,
       to: toEmail,

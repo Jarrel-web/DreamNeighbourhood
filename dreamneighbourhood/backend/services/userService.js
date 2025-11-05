@@ -11,7 +11,7 @@ export class UserService {
     this.observers = [];
   }
 
-  // Observer pattern - explained below
+  
   addObserver(observer) {
     this.observers.push(observer);
   }

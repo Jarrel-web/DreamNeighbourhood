@@ -50,14 +50,25 @@ export const verifyEmail = async (req, res) => {
     
     await userService.verifyEmail(token);
 
-    res.status(200).json({ message: "Email verified successfully" });
+    res.status(200).json({ 
+      success: true, 
+      message: "Email verified successfully" 
+    });
   } catch (error) {
     console.error("Error verifying email:", error.message);
-    // EXACT same error handling
+    
     if (error.message === "Invalid or expired token") {
-      res.status(400).json({ message: error.message });
+      res.status(400).json({ 
+        success: false, 
+        error: "invalid_token",
+        message: error.message 
+      });
     } else {
-      res.status(500).json({ message: "Server error", error: error.message });
+      res.status(500).json({ 
+        success: false, 
+        error: "server_error",
+        message: error.message 
+      });
     }
   }
 };

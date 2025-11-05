@@ -11,4 +11,5 @@ export const routes = {
   account: "/account",
   error: "*",
   profile: "/profile",
+  verifyEmail: "/verify-email",
 };

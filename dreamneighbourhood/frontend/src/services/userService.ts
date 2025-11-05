@@ -22,6 +22,11 @@ export type RefreshTokenResponse = {
     is_verified: boolean;
   };
 };
+export type VerifyEmailResponse = { 
+  success: boolean; 
+  message: string;
+  error?: string;
+};
 export type SendVerificationEmailResponse = { message: string };
 
 export async function changePassword(currentPassword: string, newPassword: string): Promise<ChangePasswordResponse> {
@@ -74,5 +79,11 @@ export async function updateProfile(username: string): Promise<{ message: string
     method: "PUT",
     headers: { ...authHeader() },
     body: JSON.stringify({ username }),
+  });
+}
+export async function verifyEmail(token: string): Promise<VerifyEmailResponse> {
+  return apiRequest<VerifyEmailResponse>(`/users/verify-email?token=${token}`, {
+    method: "GET",
+    // No auth header needed since this is public
   });
 }
