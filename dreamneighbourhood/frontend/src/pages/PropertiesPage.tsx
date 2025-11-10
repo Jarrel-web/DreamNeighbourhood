@@ -57,7 +57,7 @@ const PropertyDetailsPage: React.FC = () => {
             <p className="text-gray-600">{currentProperty.town}</p>
             
             <div className="my-4">
-              <p>{currentProperty.flat_type} • {currentProperty.floor_area_sqm} sqm</p>
+              <p>{currentProperty.flat_type} • {currentProperty.floor_area} sqm</p>
               <p>{currentProperty.storey_range} • {currentProperty.flat_model}</p>
             </div>
 
